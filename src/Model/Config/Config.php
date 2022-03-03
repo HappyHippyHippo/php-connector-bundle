@@ -137,7 +137,7 @@ class Config extends Model implements ConfigInterface
      */
     private function getEnv(string $name, string $default): string
     {
-        $env = sprintf('DREAMSHAPER_%s_%s', strtoupper($this->domain), strtoupper($name));
+        $env = sprintf('HIPPY_%s_%s', strtoupper($this->domain), strtoupper($name));
         $value = getenv($env);
         return $value ?: $default;
     }
