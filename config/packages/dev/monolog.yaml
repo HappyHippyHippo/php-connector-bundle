@@ -1,0 +1,8 @@
+monolog:
+  handlers:
+    main:
+      type: rotating_file
+      path: "%kernel.logs_dir%/api.log"
+      level: debug
+      formatter: 'monolog.formatter.json'
+      channels: ["app"]

@@ -1,0 +1,158 @@
+testConstruct:
+  'default':
+    expected:
+      client_config:
+        base_uri: ''
+        http_errors: false
+        allow_redirects: false
+      log_level_request: info
+      log_level_response: info
+      log_level_cached: info
+      log_level_exception: error
+      endpoints: []
+
+testLoad:
+  'no config or env':
+    domain: __dummy_domain__
+    config: []
+    envs: []
+    expected:
+      client_config:
+        base_uri: ''
+        http_errors: false
+        allow_redirects: false
+      log_level_request: info
+      log_level_response: info
+      log_level_cached: info
+      log_level_exception: error
+  'config override':
+    domain: __dummy_domain__
+    config:
+      client_config:
+        base_uri: __dummy_url__
+        http_errors: true
+        allow_redirects: true
+      log_level_request: warning
+      log_level_response: warning
+      log_level_cached: warning
+      log_level_exception: fatal
+    envs: []
+    expected:
+      client_config:
+        base_uri: __dummy_url__
+        http_errors: true
+        allow_redirects: true
+      log_level_request: warning
+      log_level_response: warning
+      log_level_cached: warning
+      log_level_exception: fatal
+  'config.base_url override':
+    domain: __dummy_domain__
+    config:
+      client_config:
+        base_uri: __dummy_url__
+        http_errors: true
+        allow_redirects: true
+      log_level_request: warning
+      log_level_response: warning
+      log_level_cached: warning
+      log_level_exception: fatal
+    envs:
+      DREAMSHAPER___DUMMY_DOMAIN___BASE_URL: __dummy_overrided_url__
+    expected:
+      client_config:
+        base_uri: __dummy_overrided_url__
+        http_errors: true
+        allow_redirects: true
+      log_level_request: warning
+      log_level_response: warning
+      log_level_cached: warning
+      log_level_exception: fatal
+  'log request level override':
+    domain: __dummy_domain__
+    config:
+      client_config:
+        base_uri: __dummy_url__
+        http_errors: true
+        allow_redirects: true
+      log_level_request: warning
+      log_level_response: warning
+      log_level_cached: warning
+      log_level_exception: fatal
+    envs:
+      DREAMSHAPER___DUMMY_DOMAIN___LOG_LEVEL_REQUEST: debug
+    expected:
+      client_config:
+        base_uri: __dummy_url__
+        http_errors: true
+        allow_redirects: true
+      log_level_request: debug
+      log_level_response: warning
+      log_level_cached: warning
+      log_level_exception: fatal
+  'log response level override':
+    domain: __dummy_domain__
+    config:
+      client_config:
+        base_uri: __dummy_url__
+        http_errors: true
+        allow_redirects: true
+      log_level_request: warning
+      log_level_response: warning
+      log_level_cached: warning
+      log_level_exception: fatal
+    envs:
+      DREAMSHAPER___DUMMY_DOMAIN___LOG_LEVEL_RESPONSE: debug
+    expected:
+      client_config:
+        base_uri: __dummy_url__
+        http_errors: true
+        allow_redirects: true
+      log_level_request: warning
+      log_level_response: debug
+      log_level_cached: warning
+      log_level_exception: fatal
+  'log cached level override':
+    domain: __dummy_domain__
+    config:
+      client_config:
+        base_uri: __dummy_url__
+        http_errors: true
+        allow_redirects: true
+      log_level_request: warning
+      log_level_response: warning
+      log_level_cached: warning
+      log_level_exception: fatal
+    envs:
+      DREAMSHAPER___DUMMY_DOMAIN___LOG_LEVEL_CACHED: debug
+    expected:
+      client_config:
+        base_uri: __dummy_url__
+        http_errors: true
+        allow_redirects: true
+      log_level_request: warning
+      log_level_response: warning
+      log_level_cached: debug
+      log_level_exception: fatal
+  'log exception level override':
+    domain: __dummy_domain__
+    config:
+      client_config:
+        base_uri: __dummy_url__
+        http_errors: true
+        allow_redirects: true
+      log_level_request: warning
+      log_level_response: warning
+      log_level_cached: warning
+      log_level_exception: fatal
+    envs:
+      DREAMSHAPER___DUMMY_DOMAIN___LOG_LEVEL_EXCEPTION: debug
+    expected:
+      client_config:
+        base_uri: __dummy_url__
+        http_errors: true
+        allow_redirects: true
+      log_level_request: warning
+      log_level_response: warning
+      log_level_cached: warning
+      log_level_exception: debug
