@@ -58,7 +58,7 @@ testLoad:
       log_level_cached: warning
       log_level_exception: fatal
     envs:
-      DREAMSHAPER___DUMMY_DOMAIN___BASE_URL: __dummy_overrided_url__
+      HIPPY___DUMMY_DOMAIN___BASE_URL: __dummy_overrided_url__
     expected:
       client_config:
         base_uri: __dummy_overrided_url__
@@ -80,7 +80,7 @@ testLoad:
       log_level_cached: warning
       log_level_exception: fatal
     envs:
-      DREAMSHAPER___DUMMY_DOMAIN___LOG_LEVEL_REQUEST: debug
+      HIPPY___DUMMY_DOMAIN___LOG_LEVEL_REQUEST: debug
     expected:
       client_config:
         base_uri: __dummy_url__
@@ -102,7 +102,7 @@ testLoad:
       log_level_cached: warning
       log_level_exception: fatal
     envs:
-      DREAMSHAPER___DUMMY_DOMAIN___LOG_LEVEL_RESPONSE: debug
+      HIPPY___DUMMY_DOMAIN___LOG_LEVEL_RESPONSE: debug
     expected:
       client_config:
         base_uri: __dummy_url__
@@ -124,7 +124,7 @@ testLoad:
       log_level_cached: warning
       log_level_exception: fatal
     envs:
-      DREAMSHAPER___DUMMY_DOMAIN___LOG_LEVEL_CACHED: debug
+      HIPPY___DUMMY_DOMAIN___LOG_LEVEL_CACHED: debug
     expected:
       client_config:
         base_uri: __dummy_url__
@@ -146,7 +146,7 @@ testLoad:
       log_level_cached: warning
       log_level_exception: fatal
     envs:
-      DREAMSHAPER___DUMMY_DOMAIN___LOG_LEVEL_EXCEPTION: debug
+      HIPPY___DUMMY_DOMAIN___LOG_LEVEL_EXCEPTION: debug
     expected:
       client_config:
         base_uri: __dummy_url__
