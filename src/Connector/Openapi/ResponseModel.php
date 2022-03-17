@@ -6,6 +6,9 @@ use Hippy\Connector\Model\ResponseModel as BaseResponseModel;
 use Hippy\Error\ErrorCollection;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * @method string getData()
+ */
 class ResponseModel extends BaseResponseModel
 {
     /**
@@ -18,14 +21,6 @@ class ResponseModel extends BaseResponseModel
         ?ErrorCollection $errors = null,
         protected string $data = '',
     ) {
-        parent::__construct($response, $errors);
-    }
-
-    /**
-     * @return string
-     */
-    public function getData(): string
-    {
-        return $this->data;
+        parent::__construct($response, $errors ?? new ErrorCollection());
     }
 }

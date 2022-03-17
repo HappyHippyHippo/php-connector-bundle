@@ -1,22 +1,23 @@
 <?php
 
-namespace Hippy\Connector\Log;
+namespace Hippy\Connector\Connector;
 
-use Hippy\Connector\Model\RequestModelInterface;
-use Hippy\Connector\Model\ResponseModelInterface;
+use Hippy\Connector\Log\AbstractLoggerAdapter;
+use Hippy\Connector\Model\RequestModel;
+use Hippy\Connector\Model\ResponseModel;
 use Throwable;
 
-abstract class AbstractLoggerHandler implements LoggerHandlerInterface
+abstract class AbstractLoggerHandler
 {
     /**
-     * @param LoggerAdapterInterface|null $adapter
+     * @param AbstractLoggerAdapter|null $adapter
      * @param string $requestMsg
      * @param string $responseMsg
      * @param string $cachedResponseMsg
      * @param string $exceptionMsg
      */
     public function __construct(
-        protected ?LoggerAdapterInterface $adapter = null,
+        protected ?AbstractLoggerAdapter $adapter = null,
         protected string $requestMsg = '',
         protected string $responseMsg = '',
         protected string $cachedResponseMsg = '',
@@ -25,37 +26,40 @@ abstract class AbstractLoggerHandler implements LoggerHandlerInterface
     }
 
     /**
-     * @return LoggerAdapterInterface|null
-     */
-    public function getAdapter(): ?LoggerAdapterInterface
-    {
-        return $this->adapter;
-    }
-
-    /**
      * @return array<string, mixed>
      */
     abstract protected function createLogEntrySkeleton(): array;
 
     /**
-     * @param RequestModelInterface $request
+     * @param RequestModel $request
      * @return void
      */
-    public function writeRequest(RequestModelInterface $request): void
+    public function writeRequest(RequestModel $request): void
     {
         if (empty($this->adapter)) {
             return;
         }
 
-        $this->adapter->logRequest($this->requestMsg, $this->createLogEntrySkeleton());
+        $this->adapter->logRequest(
+            $this->requestMsg,
+            array_merge(
+                $this->createLogEntrySkeleton(),
+                [
+                    'request' => [
+                        'headers' => $this->flatHeaders($request->getHeaders()),
+                        'params' => $request->jsonSerialize(),
+                    ],
+                ]
+            )
+        );
     }
 
     /**
-     * @param RequestModelInterface $request
-     * @param ResponseModelInterface $response
+     * @param RequestModel $request
+     * @param ResponseModel $response
      * @return void
      */
-    public function writeResponse(RequestModelInterface $request, ResponseModelInterface $response): void
+    public function writeResponse(RequestModel $request, ResponseModel $response): void
     {
         if (empty($this->adapter)) {
             return;
@@ -81,11 +85,11 @@ abstract class AbstractLoggerHandler implements LoggerHandlerInterface
     }
 
     /**
-     * @param RequestModelInterface $request
-     * @param ResponseModelInterface $response
+     * @param RequestModel $request
+     * @param ResponseModel $response
      * @return void
      */
-    public function writeDryResponse(RequestModelInterface $request, ResponseModelInterface $response): void
+    public function writeDryResponse(RequestModel $request, ResponseModel $response): void
     {
         if (empty($this->adapter)) {
             return;
@@ -107,11 +111,11 @@ abstract class AbstractLoggerHandler implements LoggerHandlerInterface
     }
 
     /**
-     * @param RequestModelInterface $request
-     * @param ResponseModelInterface $response
+     * @param RequestModel $request
+     * @param ResponseModel $response
      * @return void
      */
-    public function writeCachedResponse(RequestModelInterface $request, ResponseModelInterface $response): void
+    public function writeCachedResponse(RequestModel $request, ResponseModel $response): void
     {
         if (empty($this->adapter)) {
             return;
@@ -133,11 +137,11 @@ abstract class AbstractLoggerHandler implements LoggerHandlerInterface
     }
 
     /**
-     * @param RequestModelInterface $request
+     * @param RequestModel $request
      * @param Throwable $exception
      * @return void
      */
-    public function writeException(RequestModelInterface $request, Throwable $exception): void
+    public function writeException(RequestModel $request, Throwable $exception): void
     {
         if (empty($this->adapter)) {
             return;

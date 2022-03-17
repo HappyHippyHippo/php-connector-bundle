@@ -1,19 +1,16 @@
 <?php
 
-namespace Hippy\Connector\Tests\Unit\Model\Config;
+namespace Hippy\Connector\Tests\Unit\Config;
 
-use Hippy\Connector\Model\Config\Endpoint;
+use Hippy\Connector\Config\Endpoint;
 use PHPUnit\Framework\TestCase;
 
-/** @coversDefaultClass \Hippy\Connector\Model\Config\Endpoint */
+/** @coversDefaultClass \Hippy\Connector\Config\Endpoint */
 class EndpointTest extends TestCase
 {
     /**
      * @return void
      * @covers ::__construct()
-     * @covers ::getName()
-     * @covers ::isCacheEnabled
-     * @covers ::getCacheTTL
      */
     public function testConstructor(): void
     {

@@ -4,7 +4,7 @@ namespace Hippy\Connector\Tests\Unit\Model;
 
 use Hippy\Connector\Model\CachedResponseModel;
 use Hippy\Error\ErrorCollection;
-use Hippy\Model\ModelInterface;
+use Hippy\Model\Model;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,11 +14,8 @@ class CachedResponseModelTest extends TestCase
     /**
      * @return void
      * @covers ::__construct
-     * @covers ::getResponse
      * @covers ::getStatusCode
      * @covers ::getHeaders
-     * @covers ::getErrors
-     * @covers ::getData
      */
     public function testConstructorWithoutArguments(): void
     {
@@ -34,16 +31,13 @@ class CachedResponseModelTest extends TestCase
     /**
      * @return void
      * @covers ::__construct
-     * @covers ::getResponse
      * @covers ::getStatusCode
      * @covers ::getHeaders
-     * @covers ::getErrors
-     * @covers ::getData
      */
     public function testConstructorWithArguments(): void
     {
         $statusCode = Response::HTTP_NOT_FOUND;
-        $data = $this->createMock(ModelInterface::class);
+        $data = $this->createMock(Model::class);
 
         $model = new CachedResponseModel($statusCode, $data);
 

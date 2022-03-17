@@ -2,20 +2,20 @@
 
 namespace Hippy\Connector\Exception;
 
-use Hippy\Connector\Model\RequestModelInterface;
+use Hippy\Connector\Model\RequestModel;
 use Hippy\Error\Error;
 use Throwable;
 
 abstract class ClientException extends Exception
 {
     /**
-     * @param RequestModelInterface $request
+     * @param RequestModel $request
      * @param string $message
      * @param int $code
      * @param Throwable|null $previous
      */
     public function __construct(
-        private RequestModelInterface $request,
+        protected RequestModel $request,
         string $message = '',
         int $code = 0,
         Throwable $previous = null
@@ -26,9 +26,9 @@ abstract class ClientException extends Exception
     }
 
     /**
-     * @return RequestModelInterface
+     * @return RequestModel
      */
-    public function getRequest(): RequestModelInterface
+    public function getRequest(): RequestModel
     {
         return $this->request;
     }

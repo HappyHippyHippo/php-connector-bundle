@@ -14,9 +14,6 @@ class ResponseModelTest extends TestCase
     /**
      * @return void
      * @covers ::__construct
-     * @covers ::getResponse
-     * @covers ::getErrors
-     * @covers ::getData
      */
     public function testConstructorWithoutErrorsArguments(): void
     {
@@ -33,9 +30,6 @@ class ResponseModelTest extends TestCase
     /**
      * @return void
      * @covers ::__construct
-     * @covers ::getResponse
-     * @covers ::getErrors
-     * @covers ::getData
      */
     public function testConstructorWithErrorsArguments(): void
     {

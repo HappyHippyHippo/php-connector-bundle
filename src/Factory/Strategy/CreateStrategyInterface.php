@@ -2,10 +2,10 @@
 
 namespace Hippy\Connector\Factory\Strategy;
 
-use Hippy\Connector\Cache\CacheAdapterInterface;
-use Hippy\Connector\Connector\ConnectorInterface;
-use Hippy\Connector\Log\LoggerAdapterInterface;
-use Hippy\Connector\Model\Config\EndpointInterface;
+use Hippy\Connector\Cache\CacheAdapter;
+use Hippy\Connector\Config\Endpoint;
+use Hippy\Connector\Connector\AbstractConnector;
+use Hippy\Connector\Log\AbstractLoggerAdapter;
 use GuzzleHttp\ClientInterface;
 
 interface CreateStrategyInterface
@@ -18,15 +18,15 @@ interface CreateStrategyInterface
 
     /**
      * @param ClientInterface $client
-     * @param EndpointInterface $config
-     * @param LoggerAdapterInterface|null $loggerAdapter
-     * @param CacheAdapterInterface|null $cacheAdapter
-     * @return ConnectorInterface
+     * @param Endpoint $config
+     * @param AbstractLoggerAdapter|null $loggerAdapter
+     * @param CacheAdapter|null $cacheAdapter
+     * @return AbstractConnector
      */
     public function create(
         ClientInterface $client,
-        EndpointInterface $config,
-        ?LoggerAdapterInterface $loggerAdapter = null,
-        ?CacheAdapterInterface $cacheAdapter = null
-    ): ConnectorInterface;
+        Endpoint $config,
+        ?AbstractLoggerAdapter $loggerAdapter = null,
+        ?CacheAdapter $cacheAdapter = null
+    ): AbstractConnector;
 }

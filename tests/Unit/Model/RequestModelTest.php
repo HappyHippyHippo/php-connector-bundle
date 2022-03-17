@@ -11,8 +11,6 @@ class RequestModelTest extends TestCase
     /**
      * @return void
      * @covers ::__construct
-     * @SuppressWarnings(PHPMD.UndefinedVariable)
-     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
     public function testConstructor(): void
     {
@@ -33,7 +31,6 @@ class RequestModelTest extends TestCase
     /**
      * @return void
      * @covers ::__construct
-     * @covers ::getHeaders
      */
     public function testGetHeaders(): void
     {
@@ -46,7 +43,6 @@ class RequestModelTest extends TestCase
     /**
      * @return void
      * @covers ::__construct
-     * @covers ::getHeaders
      * @covers ::setHeader
      */
     public function testSetHeader(): void
@@ -61,24 +57,6 @@ class RequestModelTest extends TestCase
     /**
      * @return void
      * @covers ::__construct
-     * @covers ::getHeaders
-     * @covers ::setBearerAuthHeader
-     */
-    public function testSetBearerAuthHeader(): void
-    {
-        $token = '__dummy_token__';
-
-        $sut = new RequestModel();
-
-        $this->assertSame($sut, $sut->setBearerAuthHeader($token));
-
-        $this->assertEquals(['Authorization' => 'Bearer ' . $token], $sut->getHeaders());
-    }
-
-    /**
-     * @return void
-     * @covers ::__construct
-     * @covers ::getHeaders
      * @covers ::setJsonContentTypeHeader
      */
     public function testSetJsonContentTypeHeader(): void
@@ -93,7 +71,6 @@ class RequestModelTest extends TestCase
     /**
      * @return void
      * @covers ::__construct
-     * @covers ::getHeaders
      * @covers ::setRequestIdHeader
      */
     public function testSetRequestIdHeader(): void
@@ -110,41 +87,37 @@ class RequestModelTest extends TestCase
     /**
      * @return void
      * @covers ::__construct
-     * @covers ::getHeaders
-     * @covers ::setOrganizationIdHeader
+     * @covers ::setBearerAuthHeader
      */
-    public function testSetOrganizationIdHeader(): void
+    public function testSetBearerAuthHeader(): void
     {
-        $orgId = 123;
+        $token = '__dummy_token__';
 
         $sut = new RequestModel();
 
-        $this->assertSame($sut, $sut->setOrganizationIdHeader($orgId));
+        $this->assertSame($sut, $sut->setBearerAuthHeader($token));
 
-        $this->assertEquals(['X-Organization-Id' => '123'], $sut->getHeaders());
+        $this->assertEquals(['Authorization' => 'Bearer ' . $token], $sut->getHeaders());
     }
 
     /**
      * @return void
      * @covers ::__construct
-     * @covers ::getHeaders
      * @covers ::setAuthHeaders
      */
     public function testSetAuthHeaders(): void
     {
         $tokenId = '__dummy_token_id__';
         $userId = '__dummy_user_id__';
-        $userUUID = '__dummy_user_uuid__';
         $userEmail = '__dummy_user_email__';
 
         $sut = new RequestModel();
 
-        $this->assertSame($sut, $sut->setAuthHeaders($tokenId, $userId, $userUUID, $userEmail));
+        $this->assertSame($sut, $sut->setAuthHeaders($tokenId, $userId, $userEmail));
 
         $this->assertEquals([
             'X-Auth-Token-Id' => $tokenId,
             'X-Auth-User-Id' => $userId,
-            'X-Auth-User-UUID' => $userUUID,
             'X-Auth-User-Email' => $userEmail,
         ], $sut->getHeaders());
     }

@@ -1,10 +1,15 @@
 <?php
 
-namespace Hippy\Connector\Model\Config;
+namespace Hippy\Connector\Config;
 
 use Hippy\Model\Model;
 
-class Endpoint extends Model implements EndpointInterface
+/**
+ * @method string getName()
+ * @method bool isCacheEnabled()
+ * @method int getCacheTTL()
+ */
+class Endpoint extends Model
 {
     /** @var bool */
     protected bool $cacheEnabled;
@@ -24,29 +29,5 @@ class Endpoint extends Model implements EndpointInterface
             'cacheEnabled' => (($config['cache'] ?? [])['enabled'] ?? 'false') === true,
             'cacheTTL' => ($config['cache'] ?? [])['ttl'] ?? 0
         ]);
-    }
-
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isCacheEnabled(): bool
-    {
-        return $this->cacheEnabled;
-    }
-
-    /**
-     * @return int
-     */
-    public function getCacheTTL(): int
-    {
-        return $this->cacheTTL;
     }
 }

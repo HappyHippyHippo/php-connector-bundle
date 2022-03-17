@@ -3,14 +3,14 @@
 namespace Hippy\Connector\Tests\Unit\Connector\Check;
 
 use Hippy\Connector\Connector\Check\ResponseModel;
-use Hippy\Connector\Connector\Check\ResponseTransformer;
+use Hippy\Connector\Connector\Check\ResponseHandler;
 use Hippy\Error\Error;
 use Hippy\Error\ErrorCollection;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-/** @coversDefaultClass \Hippy\Connector\Connector\Check\ResponseTransformer */
+/** @coversDefaultClass \Hippy\Connector\Connector\Check\ResponseHandler */
 class ResponseTransformerTest extends TestCase
 {
     /**
@@ -46,7 +46,7 @@ class ResponseTransformerTest extends TestCase
                 'data' => $data,
             ]));
 
-        $transformer = new ResponseTransformer();
+        $transformer = new ResponseHandler();
         $result = $transformer->transform($response);
         if (!($result instanceof ResponseModel)) {
             $this->fail('response object is not a response model');

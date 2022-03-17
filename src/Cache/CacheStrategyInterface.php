@@ -3,6 +3,7 @@
 namespace Hippy\Connector\Cache;
 
 use Psr\Cache\CacheItemInterface;
+use Psr\Cache\InvalidArgumentException;
 
 interface CacheStrategyInterface
 {
@@ -21,6 +22,7 @@ interface CacheStrategyInterface
     /**
      * @param string $key
      * @return CacheItemInterface
+     * @throws InvalidArgumentException
      */
     public function getItem(string $key): CacheItemInterface;
 

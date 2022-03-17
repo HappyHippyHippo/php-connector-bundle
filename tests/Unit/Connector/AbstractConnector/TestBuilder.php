@@ -2,12 +2,12 @@
 
 namespace Hippy\Connector\Tests\Unit\Connector\AbstractConnector;
 
-use Hippy\Connector\Cache\CacheInterface;
+use Hippy\Connector\Config\Endpoint;
+use Hippy\Connector\Connector\AbstractCacheHandler;
 use Hippy\Connector\Connector\AbstractConnector;
-use Hippy\Connector\Log\LoggerHandlerInterface;
-use Hippy\Connector\Model\Config\EndpointInterface;
-use Hippy\Connector\Model\RequestModelInterface;
-use Hippy\Connector\Transformer\ResponseTransformerInterface;
+use Hippy\Connector\Connector\AbstractLoggerHandler;
+use Hippy\Connector\Connector\AbstractResponseHandler;
+use Hippy\Connector\Model\RequestModel;
 use GuzzleHttp\ClientInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -18,23 +18,23 @@ abstract class TestBuilder extends TestCase
     /** @var ClientInterface&MockObject */
     protected ClientInterface $client;
 
-    /** @var EndpointInterface&MockObject */
-    protected EndpointInterface $config;
+    /** @var Endpoint&MockObject */
+    protected Endpoint $config;
 
-    /** @var ResponseTransformerInterface&MockObject */
-    protected ResponseTransformerInterface $transformer;
+    /** @var AbstractResponseHandler&MockObject */
+    protected AbstractResponseHandler $transformer;
 
-    /** @var RequestModelInterface&MockObject */
-    protected RequestModelInterface $requestModel;
+    /** @var RequestModel&MockObject */
+    protected RequestModel $requestModel;
 
     /** @var ResponseInterface&MockObject */
     protected ResponseInterface $response;
 
-    /** @var LoggerHandlerInterface&MockObject */
-    protected LoggerHandlerInterface $logger;
+    /** @var AbstractLoggerHandler&MockObject */
+    protected AbstractLoggerHandler $logger;
 
-    /** @var CacheInterface&MockObject */
-    protected CacheInterface $cache;
+    /** @var AbstractCacheHandler&MockObject */
+    protected AbstractCacheHandler $cache;
 
     /**
      * @return void
@@ -42,12 +42,15 @@ abstract class TestBuilder extends TestCase
     protected function setUp(): void
     {
         $this->client = $this->createMock(ClientInterface::class);
-        $this->config = $this->createMock(EndpointInterface::class);
-        $this->transformer = $this->createMock(ResponseTransformerInterface::class);
-        $this->requestModel = $this->createMock(RequestModelInterface::class);
+        $this->config = $this->getMockBuilder(Endpoint::class)
+            ->addMethods(['isCacheEnabled', 'getCacheTTL'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->transformer = $this->createMock(AbstractResponseHandler::class);
+        $this->requestModel = $this->createMock(RequestModel::class);
         $this->response = $this->createMock(ResponseInterface::class);
-        $this->logger = $this->createMock(LoggerHandlerInterface::class);
-        $this->cache = $this->createMock(CacheInterface::class);
+        $this->logger = $this->createMock(AbstractLoggerHandler::class);
+        $this->cache = $this->createMock(AbstractCacheHandler::class);
     }
 
     /**

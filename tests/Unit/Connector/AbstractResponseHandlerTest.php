@@ -2,8 +2,8 @@
 
 namespace Hippy\Connector\Tests\Unit\Transformer;
 
+use Hippy\Connector\Connector\AbstractResponseHandler;
 use Hippy\Connector\Exception\InvalidResponseContentException;
-use Hippy\Connector\Transformer\AbstractResponseTransformer;
 use Hippy\Error\Error;
 use Hippy\Error\ErrorCollection;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -12,18 +12,18 @@ use Psr\Http\Message\ResponseInterface;
 use ReflectionException;
 use ReflectionMethod;
 
-/** @coversDefaultClass \Hippy\Connector\Transformer\AbstractResponseTransformer */
-class AbstractResponseTransformerTest extends TestCase
+/** @coversDefaultClass \Hippy\Connector\Connector\AbstractResponseHandler */
+class AbstractResponseHandlerTest extends TestCase
 {
-    /** @var AbstractResponseTransformer&MockObject */
-    private AbstractResponseTransformer $sut;
+    /** @var AbstractResponseHandler&MockObject */
+    private AbstractResponseHandler $sut;
 
     /**
      * @return void
      */
     protected function setUp(): void
     {
-        $this->sut = $this->getMockForAbstractClass(AbstractResponseTransformer::class);
+        $this->sut = $this->getMockForAbstractClass(AbstractResponseHandler::class);
     }
 
     /**
@@ -39,7 +39,7 @@ class AbstractResponseTransformerTest extends TestCase
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->once())->method('getBody')->willReturn($body);
 
-        $method = new ReflectionMethod(AbstractResponseTransformer::class, 'getContent');
+        $method = new ReflectionMethod(AbstractResponseHandler::class, 'getContent');
         $result = $method->invoke($this->sut, $response);
 
         $this->assertEquals($expected, $result);
@@ -60,7 +60,7 @@ class AbstractResponseTransformerTest extends TestCase
         $this->expectException(InvalidResponseContentException::class);
         $this->expectExceptionMessage('string');
 
-        $method = new ReflectionMethod(AbstractResponseTransformer::class, 'getContent');
+        $method = new ReflectionMethod(AbstractResponseHandler::class, 'getContent');
         $method->invoke($this->sut, $response);
     }
 
@@ -74,7 +74,7 @@ class AbstractResponseTransformerTest extends TestCase
      */
     public function testGetStatus(array $response, bool $expected): void
     {
-        $method = new ReflectionMethod(AbstractResponseTransformer::class, 'getStatus');
+        $method = new ReflectionMethod(AbstractResponseHandler::class, 'getStatus');
         $this->assertEquals($expected, $method->invoke($this->sut, $response));
     }
 
@@ -117,7 +117,7 @@ class AbstractResponseTransformerTest extends TestCase
      */
     public function testGetErrors(array $response, ErrorCollection $expected): void
     {
-        $method = new ReflectionMethod(AbstractResponseTransformer::class, 'getErrors');
+        $method = new ReflectionMethod(AbstractResponseHandler::class, 'getErrors');
         $this->assertEquals($expected, $method->invoke($this->sut, $response));
     }
 

@@ -1,15 +1,23 @@
 <?php
 
-namespace Hippy\Connector\Transformer;
+namespace Hippy\Connector\Connector;
 
 use Hippy\Connector\Exception\InvalidResponseContentException;
+use Hippy\Connector\Model\ResponseModel;
 use Hippy\Error\Error;
 use Hippy\Error\ErrorCollection;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 
-abstract class AbstractResponseTransformer implements ResponseTransformerInterface
+abstract class AbstractResponseHandler
 {
+    /**
+     * @param ResponseInterface $response
+     * @return ResponseModel
+     * @throws InvalidResponseContentException
+     */
+    abstract public function transform(ResponseInterface $response): ResponseModel;
+
     /**
      * @param ResponseInterface $response
      * @return array<string, mixed>

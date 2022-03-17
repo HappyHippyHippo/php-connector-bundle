@@ -6,6 +6,9 @@ use Hippy\Connector\Model\ResponseModel as BaseResponseModel;
 use Hippy\Error\ErrorCollection;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * @method array<int|string, mixed> getData()
+ */
 class ResponseModel extends BaseResponseModel
 {
     /**
@@ -18,14 +21,6 @@ class ResponseModel extends BaseResponseModel
         ?ErrorCollection $errors = null,
         protected array $data = [],
     ) {
-        parent::__construct($response, $errors);
-    }
-
-    /**
-     * @return array<int|string, mixed>
-     */
-    public function getData(): array
-    {
-        return $this->data;
+        parent::__construct($response, $errors ?? new ErrorCollection());
     }
 }

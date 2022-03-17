@@ -2,7 +2,7 @@
 
 namespace Hippy\Connector\Connector\Config;
 
-use Hippy\Connector\Log\AbstractLoggerHandler as BaseLoggerHandler;
+use Hippy\Connector\Connector\AbstractLoggerHandler as BaseLoggerHandler;
 
 abstract class AbstractLoggerHandler extends BaseLoggerHandler
 {

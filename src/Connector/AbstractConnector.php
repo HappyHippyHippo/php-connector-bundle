@@ -3,71 +3,38 @@
 namespace Hippy\Connector\Connector;
 
 use DateTime;
-use Hippy\Connector\Cache\CacheInterface;
+use Hippy\Connector\Config\Endpoint;
 use Hippy\Connector\Exception\ConnectionException;
 use Hippy\Connector\Exception\InvalidResponseContentException;
 use Hippy\Connector\Exception\UnknownClientException;
-use Hippy\Connector\Log\LoggerHandlerInterface;
-use Hippy\Connector\Model\Config\EndpointInterface;
-use Hippy\Connector\Model\RequestModelInterface;
+use Hippy\Connector\Model\RequestModel;
 use Hippy\Connector\Model\ResponseModel;
-use Hippy\Connector\Model\ResponseModelInterface;
-use Hippy\Connector\Transformer\ResponseTransformerInterface;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
-/** @SuppressWarnings(PHPMD.CouplingBetweenObjects) */
-abstract class AbstractConnector implements ConnectorInterface
+abstract class AbstractConnector
 {
-    /** @var int */
-    protected int $serviceCode;
-
-    /** @var int */
-    protected int $endpointCode;
-
-    /** @var ClientInterface */
-    protected ClientInterface $client;
-
-    /** @var EndpointInterface */
-    protected EndpointInterface $config;
-
-    /** @var ResponseTransformerInterface|null */
-    protected ?ResponseTransformerInterface $transformer;
-
-    /** @var LoggerHandlerInterface|null */
-    protected ?LoggerHandlerInterface $logger;
-
-    /** @var CacheInterface|null */
-    protected ?CacheInterface $cache;
-
     /**
      * @param int $serviceCode
      * @param int $endpointCode
      * @param ClientInterface $client
-     * @param EndpointInterface $config
-     * @param ResponseTransformerInterface|null $transformer
-     * @param LoggerHandlerInterface|null $logger
-     * @param CacheInterface|null $cache
+     * @param Endpoint $config
+     * @param AbstractResponseHandler|null $transformer
+     * @param AbstractLoggerHandler|null $logger
+     * @param AbstractCacheHandler|null $cache
      */
     public function __construct(
-        int $serviceCode,
-        int $endpointCode,
-        ClientInterface $client,
-        EndpointInterface $config,
-        ?ResponseTransformerInterface $transformer = null,
-        ?LoggerHandlerInterface $logger = null,
-        ?CacheInterface $cache = null
+        protected int $serviceCode,
+        protected int $endpointCode,
+        protected ClientInterface $client,
+        protected Endpoint $config,
+        protected ?AbstractResponseHandler $transformer = null,
+        protected ?AbstractLoggerHandler $logger = null,
+        protected ?AbstractCacheHandler $cache = null
     ) {
-        $this->serviceCode = $serviceCode;
-        $this->endpointCode = $endpointCode;
-        $this->client = $client;
-        $this->config = $config;
-        $this->transformer = $transformer;
-        $this->logger = $logger;
-        $this->cache = $cache;
     }
 
     /**
@@ -95,11 +62,11 @@ abstract class AbstractConnector implements ConnectorInterface
     }
 
     /**
-     * @param RequestModelInterface $request
-     * @return ResponseModelInterface
+     * @param RequestModel $request
+     * @return ResponseModel
      * @throws ConnectionException
      */
-    public function request(RequestModelInterface $request): ResponseModelInterface
+    public function request(RequestModel $request): ResponseModel
     {
         try {
             // log request
@@ -145,28 +112,28 @@ abstract class AbstractConnector implements ConnectorInterface
     }
 
     /**
-     * @param RequestModelInterface $request
+     * @param RequestModel $request
      * @return ResponseInterface
      * @throws GuzzleException
      */
-    abstract protected function execute(RequestModelInterface $request): ResponseInterface;
+    abstract protected function execute(RequestModel $request): ResponseInterface;
 
     /**
-     * @param RequestModelInterface $request
+     * @param RequestModel $request
      * @param string $message
      * @param int $statusCode
      * @return void
      */
-    protected function handleFailure(RequestModelInterface $request, string $message, int $statusCode): void
+    protected function handleFailure(RequestModel $request, string $message, int $statusCode): void
     {
         throw new UnknownClientException($request, $message, $statusCode);
     }
 
     /**
-     * @param RequestModelInterface $request
+     * @param RequestModel $request
      * @return void
      */
-    private function logRequest(RequestModelInterface $request): void
+    private function logRequest(RequestModel $request): void
     {
         if (!empty($this->logger)) {
             $this->logger->writeRequest($request);
@@ -175,11 +142,11 @@ abstract class AbstractConnector implements ConnectorInterface
 
     /**
      * @param bool $success
-     * @param RequestModelInterface $request
-     * @param ResponseModelInterface $response
+     * @param RequestModel $request
+     * @param ResponseModel $response
      * @return void
      */
-    private function logResponse(bool $success, RequestModelInterface $request, ResponseModelInterface $response): void
+    private function logResponse(bool $success, RequestModel $request, ResponseModel $response): void
     {
         if (!empty($this->logger)) {
             if ($success) {
@@ -191,11 +158,11 @@ abstract class AbstractConnector implements ConnectorInterface
     }
 
     /**
-     * @param RequestModelInterface $request
-     * @param ResponseModelInterface $response
+     * @param RequestModel $request
+     * @param ResponseModel $response
      * @return void
      */
-    private function logCachedResponse(RequestModelInterface $request, ResponseModelInterface $response): void
+    private function logCachedResponse(RequestModel $request, ResponseModel $response): void
     {
         if (!empty($this->logger)) {
             $this->logger->writeCachedResponse($request, $response);
@@ -203,11 +170,11 @@ abstract class AbstractConnector implements ConnectorInterface
     }
 
     /**
-     * @param RequestModelInterface $request
+     * @param RequestModel $request
      * @param Throwable $exception
      * @return void
      */
-    private function logException(RequestModelInterface $request, Throwable $exception): void
+    private function logException(RequestModel $request, Throwable $exception): void
     {
         if (!empty($this->logger)) {
             $this->logger->writeException($request, $exception);
@@ -215,10 +182,10 @@ abstract class AbstractConnector implements ConnectorInterface
     }
 
     /**
-     * @param RequestModelInterface $request
-     * @return ResponseModelInterface|null
+     * @param RequestModel $request
+     * @return ResponseModel|null
      */
-    private function getCachedResponse(RequestModelInterface $request): ?ResponseModelInterface
+    private function getCachedResponse(RequestModel $request): ?ResponseModel
     {
         if (empty($this->cache) || !$this->config->isCacheEnabled()) {
             return null;
@@ -228,11 +195,11 @@ abstract class AbstractConnector implements ConnectorInterface
     }
 
     /**
-     * @param RequestModelInterface $request
-     * @param ResponseModelInterface $response
+     * @param RequestModel $request
+     * @param ResponseModel $response
      * @return void
      */
-    private function cacheResponse(RequestModelInterface $request, ResponseModelInterface $response): void
+    private function cacheResponse(RequestModel $request, ResponseModel $response): void
     {
         if (empty($this->cache) || !$this->config->isCacheEnabled()) {
             return;

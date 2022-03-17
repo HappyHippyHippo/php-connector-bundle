@@ -3,14 +3,14 @@
 namespace Hippy\Connector\Tests\Unit\Connector\Openapi;
 
 use Hippy\Connector\Connector\Openapi\ResponseModel;
-use Hippy\Connector\Connector\Openapi\ResponseTransformer;
+use Hippy\Connector\Connector\Openapi\ResponseHandler;
 use Hippy\Error\Error;
 use Hippy\Error\ErrorCollection;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-/** @coversDefaultClass \Hippy\Connector\Connector\Openapi\ResponseTransformer */
+/** @coversDefaultClass \Hippy\Connector\Connector\Openapi\ResponseHandler */
 class ResponseTransformerTest extends TestCase
 {
     /**
@@ -26,7 +26,7 @@ class ResponseTransformerTest extends TestCase
         $response->expects($this->any())->method('getStatusCode')->willReturn($statusCode);
         $response->expects($this->once())->method('getBody')->willReturn($data);
 
-        $transformer = new ResponseTransformer();
+        $transformer = new ResponseHandler();
         $result = $transformer->transform($response);
         if (!($result instanceof ResponseModel)) {
             $this->fail('response object is not a response model');
@@ -69,7 +69,7 @@ class ResponseTransformerTest extends TestCase
                 'data' => ['__dummy_data__'],
             ]));
 
-        $transformer = new ResponseTransformer();
+        $transformer = new ResponseHandler();
         $result = $transformer->transform($response);
         if (!($result instanceof ResponseModel)) {
             $this->fail('response object is not a response model');

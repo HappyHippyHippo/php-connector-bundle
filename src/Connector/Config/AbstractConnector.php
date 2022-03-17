@@ -2,13 +2,13 @@
 
 namespace Hippy\Connector\Connector\Config;
 
-use Hippy\Connector\Cache\CacheInterface;
+use Hippy\Connector\Config\Endpoint;
+use Hippy\Connector\Connector\AbstractCacheHandler;
 use Hippy\Connector\Connector\AbstractConnector as BaseConnector;
+use Hippy\Connector\Connector\AbstractLoggerHandler;
+use Hippy\Connector\Connector\AbstractResponseHandler;
 use Hippy\Connector\Exception\UnknownClientException;
-use Hippy\Connector\Log\LoggerHandlerInterface;
-use Hippy\Connector\Model\Config\EndpointInterface;
-use Hippy\Connector\Model\RequestModelInterface;
-use Hippy\Connector\Transformer\ResponseTransformerInterface;
+use Hippy\Connector\Model\RequestModel as BaseRequestModel;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
@@ -29,40 +29,46 @@ abstract class AbstractConnector extends BaseConnector
     /**
      * @param int $serviceCode
      * @param ClientInterface $client
-     * @param EndpointInterface $config
-     * @param ResponseTransformerInterface|null $transformer
-     * @param LoggerHandlerInterface|null $logger
-     * @param CacheInterface|null $cache
+     * @param Endpoint $config
+     * @param AbstractResponseHandler|null $transformer
+     * @param AbstractLoggerHandler|null $logger
+     * @param AbstractCacheHandler|null $cache
      */
     public function __construct(
         int $serviceCode,
         ClientInterface $client,
-        EndpointInterface $config,
-        ?ResponseTransformerInterface $transformer = null,
-        ?LoggerHandlerInterface $logger = null,
-        ?CacheInterface $cache = null
+        Endpoint $config,
+        ?AbstractResponseHandler $transformer = null,
+        ?AbstractLoggerHandler $logger = null,
+        ?AbstractCacheHandler $cache = null
     ) {
         parent::__construct($serviceCode, self::CODE, $client, $config, $transformer, $logger, $cache);
     }
 
     /**
-     * @param RequestModelInterface $request
+     * @param BaseRequestModel $request
      * @return ResponseInterface
      * @throws GuzzleException
      */
-    protected function execute(RequestModelInterface $request): ResponseInterface
+    protected function execute(BaseRequestModel $request): ResponseInterface
     {
-        return $this->client->send(new Request(self::METHOD, self::URI_PATTERN, $request->getHeaders()));
+        return $this->client->send(
+            new Request(
+                self::METHOD,
+                self::URI_PATTERN,
+                $request->getHeaders()
+            )
+        );
     }
 
     /**
-     * @param RequestModelInterface $request
+     * @param BaseRequestModel $request
      * @param string $message
      * @param int $statusCode
      * @return void
      * @throws UnknownClientException
      */
-    protected function handleFailure(RequestModelInterface $request, string $message, int $statusCode): void
+    protected function handleFailure(BaseRequestModel $request, string $message, int $statusCode): void
     {
         if ($statusCode == Response::HTTP_SERVICE_UNAVAILABLE) {
             return;

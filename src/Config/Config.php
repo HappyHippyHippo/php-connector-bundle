@@ -1,10 +1,17 @@
 <?php
 
-namespace Hippy\Connector\Model\Config;
+namespace Hippy\Connector\Config;
 
 use Hippy\Model\Model;
 
-class Config extends Model implements ConfigInterface
+/**
+ * @method array<string, mixed> getClientConfig()
+ * @method string getLogLevelRequest()
+ * @method string getLogLevelResponse()
+ * @method string getLogLevelCached()
+ * @method string getLogLevelException()
+ */
+class Config extends Model
 {
     /** @var array<string, mixed> */
     protected const CLIENT_CONFIG_DEFAULT = [
@@ -14,7 +21,7 @@ class Config extends Model implements ConfigInterface
     ];
 
     /** @var array<string, mixed> */
-    protected array $config;
+    protected array $clientConfig;
 
     /** @var string */
     protected string $logLevelRequest;
@@ -37,7 +44,7 @@ class Config extends Model implements ConfigInterface
     public function __construct(protected string $domain)
     {
         parent::__construct([
-            'config' => self::CLIENT_CONFIG_DEFAULT,
+            'clientConfig' => self::CLIENT_CONFIG_DEFAULT,
             'logLevelRequest' => 'info',
             'logLevelResponse' => 'info',
             'logLevelCached' => 'info',
@@ -52,8 +59,8 @@ class Config extends Model implements ConfigInterface
      */
     public function load(array $config = [])
     {
-        $this->config = array_merge($this->config, $config['client_config'] ?? []);
-        $this->config['base_uri'] = $this->getEnv('BASE_URL', $this->config['base_uri']);
+        $this->clientConfig = array_merge($this->clientConfig, $config['client_config'] ?? []);
+        $this->clientConfig['base_uri'] = $this->getEnv('BASE_URL', $this->clientConfig['base_uri']);
 
         $this->logLevelRequest = $this->getLogEnv('request', $config);
         $this->logLevelResponse = $this->getLogEnv('response', $config);
@@ -66,53 +73,13 @@ class Config extends Model implements ConfigInterface
     }
 
     /**
-     * @return array<string, mixed>
-     */
-    public function getClientConfig(): array
-    {
-        return $this->config;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLogRequestLevel(): string
-    {
-        return $this->logLevelRequest;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLogResponseLevel(): string
-    {
-        return $this->logLevelResponse;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLogCachedResponseLevel(): string
-    {
-        return $this->logLevelCached;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLogExceptionLevel(): string
-    {
-        return $this->logLevelException;
-    }
-
-    /**
      * @param string $name
-     * @return EndpointInterface
+     * @return Endpoint
      */
-    public function getEndpoint(string $name): EndpointInterface
+    public function getEndpoint(string $name): Endpoint
     {
         // @phpstan-ignore-next-line
-        return $this->endpoints->find(function (EndpointInterface $item) use ($name) {
+        return $this->endpoints->find(function (Endpoint $item) use ($name) {
             return $item->getName() == $name;
         }) ?? new Endpoint($name);
     }

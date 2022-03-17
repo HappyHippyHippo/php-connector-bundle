@@ -3,8 +3,8 @@
 namespace Hippy\Connector\Tests\Unit\Config\Partial;
 
 use Hippy\Connector\Config\Partial\AbstractPartial;
-use Hippy\Connector\Model\Config\Config;
-use Hippy\Connector\Model\Config\Endpoint;
+use Hippy\Connector\Config\Config;
+use Hippy\Connector\Config\Endpoint;
 use PHPUnit\Framework\TestCase;
 
 /** @coversDefaultClass \Hippy\Connector\Config\Partial\AbstractPartial */
@@ -73,10 +73,10 @@ class AbstractPartialTest extends TestCase
             'http_errors' => false,
             'allow_redirects' => false,
         ], $result->getClientConfig());
-        $this->assertEquals($config['log_level_request'], $result->getLogRequestLevel());
-        $this->assertEquals($config['log_level_response'], $result->getLogResponseLevel());
-        $this->assertEquals($config['log_level_cached'], $result->getLogCachedResponseLevel());
-        $this->assertEquals($config['log_level_exception'], $result->getLogExceptionLevel());
+        $this->assertEquals($config['log_level_request'], $result->getLogLevelRequest());
+        $this->assertEquals($config['log_level_response'], $result->getLogLevelResponse());
+        $this->assertEquals($config['log_level_cached'], $result->getLogLevelCached());
+        $this->assertEquals($config['log_level_exception'], $result->getLogLevelException());
     }
 
     /**

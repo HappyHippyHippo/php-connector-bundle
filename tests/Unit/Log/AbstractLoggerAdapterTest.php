@@ -2,9 +2,9 @@
 
 namespace Hippy\Connector\Tests\Unit\Log;
 
-use Hippy\Config\ConfigInterface as BaseConfigInterface;
+use Hippy\Config\Config as BaseConfig;
+use Hippy\Connector\Config\Config;
 use Hippy\Connector\Log\AbstractLoggerAdapter;
-use Hippy\Connector\Model\Config\ConfigInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -22,11 +22,11 @@ class AbstractLoggerAdapterTest extends TestCase
         'key3' => '__dummy_data_3__',
     ];
 
-    /** @var BaseConfigInterface&MockObject */
-    private BaseConfigInterface $configInterface;
+    /** @var BaseConfig&MockObject */
+    private BaseConfig $configInterface;
 
-    /** @var ConfigInterface&MockObject */
-    private ConfigInterface $config;
+    /** @var Config&MockObject */
+    private Config $config;
 
     /** @var LoggerInterface&MockObject */
     private LoggerInterface $logger;
@@ -36,32 +36,25 @@ class AbstractLoggerAdapterTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->configInterface = $this->createMock(BaseConfigInterface::class);
-        $this->config = $this->createMock(ConfigInterface::class);
+        $this->configInterface = $this->createMock(BaseConfig::class);
+        $this->config = $this->getMockBuilder(Config::class)
+            ->addMethods(['getLogLevelRequest', 'getLogLevelResponse', 'getLogLevelCached', 'getLogLevelException'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->logger = $this->createMock(LoggerInterface::class);
     }
 
     /**
      * @return void
      * @covers ::__construct()
-     * @covers ::getLogger()
-     */
-    public function testLoggerGetter(): void
-    {
-        $adapter = $this->sut([$this->configInterface, $this->logger]);
-        $this->assertEquals($this->logger, $adapter->getLogger());
-    }
-
-    /**
-     * @return void
      * @covers ::logRequest
      */
     public function testLogRequestWithNoLogger(): void
     {
-        $this->config->expects($this->never())->method('getLogRequestLevel');
-        $this->config->expects($this->never())->method('getLogResponseLevel');
-        $this->config->expects($this->never())->method('getLogCachedResponseLevel');
-        $this->config->expects($this->never())->method('getLogExceptionLevel');
+        $this->config->expects($this->never())->method('getLogLevelRequest');
+        $this->config->expects($this->never())->method('getLogLevelResponse');
+        $this->config->expects($this->never())->method('getLogLevelCached');
+        $this->config->expects($this->never())->method('getLogLevelException');
 
         $adapter = $this->sut([$this->configInterface]);
         $adapter->logRequest(self::MESSAGE, self::CONTEXT);
@@ -69,12 +62,13 @@ class AbstractLoggerAdapterTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct()
      * @covers ::logRequest
      */
     public function testLogRequest(): void
     {
         $level = 'info';
-        $this->config->expects($this->once())->method('getLogRequestLevel')->willReturn($level);
+        $this->config->expects($this->once())->method('getLogLevelRequest')->willReturn($level);
 
         $this->logger
             ->expects($this->once())
@@ -87,14 +81,15 @@ class AbstractLoggerAdapterTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct()
      * @covers ::logResponse
      */
     public function testLogResponseWithNoLogger(): void
     {
-        $this->config->expects($this->never())->method('getLogRequestLevel');
-        $this->config->expects($this->never())->method('getLogResponseLevel');
-        $this->config->expects($this->never())->method('getLogCachedResponseLevel');
-        $this->config->expects($this->never())->method('getLogExceptionLevel');
+        $this->config->expects($this->never())->method('getLogLevelRequest');
+        $this->config->expects($this->never())->method('getLogLevelResponse');
+        $this->config->expects($this->never())->method('getLogLevelCached');
+        $this->config->expects($this->never())->method('getLogLevelException');
 
         $adapter = $this->sut([$this->configInterface]);
         $adapter->logResponse(self::MESSAGE, self::CONTEXT);
@@ -102,12 +97,13 @@ class AbstractLoggerAdapterTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct()
      * @covers ::logResponse
      */
     public function testLogResponse(): void
     {
         $level = 'info';
-        $this->config->expects($this->once())->method('getLogResponseLevel')->willReturn($level);
+        $this->config->expects($this->once())->method('getLogLevelResponse')->willReturn($level);
 
         $this->logger
             ->expects($this->once())
@@ -120,14 +116,15 @@ class AbstractLoggerAdapterTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct()
      * @covers ::logCachedResponse
      */
     public function testLogCachedResponseWithNoLogger(): void
     {
-        $this->config->expects($this->never())->method('getLogRequestLevel');
-        $this->config->expects($this->never())->method('getLogResponseLevel');
-        $this->config->expects($this->never())->method('getLogCachedResponseLevel');
-        $this->config->expects($this->never())->method('getLogExceptionLevel');
+        $this->config->expects($this->never())->method('getLogLevelRequest');
+        $this->config->expects($this->never())->method('getLogLevelResponse');
+        $this->config->expects($this->never())->method('getLogLevelCached');
+        $this->config->expects($this->never())->method('getLogLevelException');
 
         $adapter = $this->sut([$this->configInterface]);
         $adapter->logCachedResponse(self::MESSAGE, self::CONTEXT);
@@ -135,12 +132,13 @@ class AbstractLoggerAdapterTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct()
      * @covers ::logCachedResponse
      */
     public function testLogCachedResponse(): void
     {
         $level = 'info';
-        $this->config->expects($this->once())->method('getLogCachedResponseLevel')->willReturn($level);
+        $this->config->expects($this->once())->method('getLogLevelCached')->willReturn($level);
 
         $this->logger
             ->expects($this->once())
@@ -153,14 +151,15 @@ class AbstractLoggerAdapterTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct()
      * @covers ::logException
      */
     public function testLogExceptionWithNoLogger(): void
     {
-        $this->config->expects($this->never())->method('getLogRequestLevel');
-        $this->config->expects($this->never())->method('getLogResponseLevel');
-        $this->config->expects($this->never())->method('getLogCachedResponseLevel');
-        $this->config->expects($this->never())->method('getLogExceptionLevel');
+        $this->config->expects($this->never())->method('getLogLevelRequest');
+        $this->config->expects($this->never())->method('getLogLevelResponse');
+        $this->config->expects($this->never())->method('getLogLevelCached');
+        $this->config->expects($this->never())->method('getLogLevelException');
 
         $adapter = $this->sut([$this->configInterface]);
         $adapter->logException(self::MESSAGE, self::CONTEXT);
@@ -168,12 +167,13 @@ class AbstractLoggerAdapterTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct()
      * @covers ::logException
      */
     public function testLogException(): void
     {
         $level = 'info';
-        $this->config->expects($this->once())->method('getLogExceptionLevel')->willReturn($level);
+        $this->config->expects($this->once())->method('getLogLevelException')->willReturn($level);
 
         $this->logger
             ->expects($this->once())

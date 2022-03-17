@@ -2,12 +2,12 @@
 
 namespace Hippy\Connector\Factory;
 
-use Hippy\Config\ConfigInterface as BaseConfigInterface;
-use Hippy\Connector\Cache\CacheAdapterInterface;
-use Hippy\Connector\Connector\ConnectorInterface;
+use Hippy\Config\Config as BaseConfig;
+use Hippy\Connector\Cache\CacheAdapter;
+use Hippy\Connector\Config\Config;
+use Hippy\Connector\Connector\AbstractConnector;
 use Hippy\Connector\Factory\Strategy\CreateStrategyInterface;
-use Hippy\Connector\Log\LoggerAdapterInterface;
-use Hippy\Connector\Model\Config\ConfigInterface;
+use Hippy\Connector\Log\AbstractLoggerAdapter;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 
@@ -21,15 +21,15 @@ abstract class AbstractConnectorFactory
 
     /**
      * @param CreateStrategyInterface[] $strategies
-     * @param BaseConfigInterface $config
-     * @param LoggerAdapterInterface|null $loggerAdapter
-     * @param CacheAdapterInterface|null $cacheAdapter
+     * @param BaseConfig $config
+     * @param AbstractLoggerAdapter|null $loggerAdapter
+     * @param CacheAdapter|null $cacheAdapter
      */
     public function __construct(
         iterable $strategies,
-        protected BaseConfigInterface $config,
-        protected ?LoggerAdapterInterface $loggerAdapter = null,
-        protected ?CacheAdapterInterface $cacheAdapter = null
+        protected BaseConfig $config,
+        protected ?AbstractLoggerAdapter $loggerAdapter = null,
+        protected ?CacheAdapter $cacheAdapter = null
     ) {
         $this->strategies = [];
         foreach ($strategies as $strategy) {
@@ -43,9 +43,9 @@ abstract class AbstractConnectorFactory
 
     /**
      * @param string $connectorId
-     * @return ConnectorInterface|null
+     * @return AbstractConnector|null
      */
-    public function create(string $connectorId): ?ConnectorInterface
+    public function create(string $connectorId): ?AbstractConnector
     {
         foreach ($this->strategies as $strategy) {
             if ($strategy->supports($connectorId)) {
@@ -74,7 +74,7 @@ abstract class AbstractConnectorFactory
     }
 
     /**
-     * @return ConfigInterface
+     * @return Config
      */
-    abstract protected function getConfig(): ConfigInterface;
+    abstract protected function getConfig(): Config;
 }

@@ -2,28 +2,20 @@
 
 namespace Hippy\Connector\Log;
 
-use Hippy\Config\ConfigInterface as BaseConfigInterface;
-use Hippy\Connector\Model\Config\ConfigInterface;
+use Hippy\Config\Config as BaseConfig;
+use Hippy\Connector\Config\Config;
 use Psr\Log\LoggerInterface;
 
-abstract class AbstractLoggerAdapter implements LoggerAdapterInterface
+abstract class AbstractLoggerAdapter
 {
     /**
-     * @param BaseConfigInterface $config
+     * @param BaseConfig $config
      * @param LoggerInterface|null $logger
      */
     public function __construct(
-        protected BaseConfigInterface $config,
+        protected BaseConfig $config,
         protected ?LoggerInterface $logger = null,
     ) {
-    }
-
-    /**
-     * @return LoggerInterface|null
-     */
-    public function getLogger(): ?LoggerInterface
-    {
-        return $this->logger;
     }
 
     /**
@@ -37,7 +29,7 @@ abstract class AbstractLoggerAdapter implements LoggerAdapterInterface
             return;
         }
 
-        $this->logger->{$this->getConfig()->getLogRequestLevel()}($message, $context);
+        $this->logger->{$this->getConfig()->getLogLevelRequest()}($message, $context);
     }
 
     /**
@@ -51,7 +43,7 @@ abstract class AbstractLoggerAdapter implements LoggerAdapterInterface
             return;
         }
 
-        $this->logger->{$this->getConfig()->getLogResponseLevel()}($message, $context);
+        $this->logger->{$this->getConfig()->getLogLevelResponse()}($message, $context);
     }
 
     /**
@@ -65,7 +57,7 @@ abstract class AbstractLoggerAdapter implements LoggerAdapterInterface
             return;
         }
 
-        $this->logger->{$this->getConfig()->getLogCachedResponseLevel()}($message, $context);
+        $this->logger->{$this->getConfig()->getLogLevelCached()}($message, $context);
     }
 
     /**
@@ -79,11 +71,11 @@ abstract class AbstractLoggerAdapter implements LoggerAdapterInterface
             return;
         }
 
-        $this->logger->{$this->getConfig()->getLogExceptionLevel()}($message, $context);
+        $this->logger->{$this->getConfig()->getLogLevelException()}($message, $context);
     }
 
     /**
-     * @return ConfigInterface
+     * @return Config
      */
-    abstract protected function getConfig(): ConfigInterface;
+    abstract protected function getConfig(): Config;
 }

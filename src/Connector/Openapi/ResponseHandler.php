@@ -2,19 +2,18 @@
 
 namespace Hippy\Connector\Connector\Openapi;
 
-use Hippy\Connector\Model\ResponseModelInterface;
-use Hippy\Connector\Transformer\AbstractResponseTransformer;
+use Hippy\Connector\Connector\AbstractResponseHandler;
 use Hippy\Error\ErrorCollection;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-class ResponseTransformer extends AbstractResponseTransformer
+class ResponseHandler extends AbstractResponseHandler
 {
     /**
      * @param ResponseInterface $response
-     * @return ResponseModelInterface
+     * @return ResponseModel
      */
-    public function transform(ResponseInterface $response): ResponseModelInterface
+    public function transform(ResponseInterface $response): ResponseModel
     {
         if ($response->getStatusCode() != Response::HTTP_OK) {
             return new ResponseModel($response, $this->getErrors($this->getContent($response)));

@@ -4,7 +4,10 @@ namespace Hippy\Connector\Model;
 
 use Hippy\Model\Model;
 
-class RequestModel extends Model implements RequestModelInterface
+/**
+ * @method array<string, string|string[]> getHeaders()
+ */
+class RequestModel extends Model
 {
     /**
      * @param array<string, mixed> $data
@@ -20,19 +23,11 @@ class RequestModel extends Model implements RequestModelInterface
     }
 
     /**
-     * @return array<string, string|string[]>
-     */
-    public function getHeaders(): array
-    {
-        return $this->headers;
-    }
-
-    /**
      * @param string $name
      * @param string $value
-     * @return RequestModelInterface
+     * @return $this
      */
-    public function setHeader(string $name, string $value): RequestModelInterface
+    public function setHeader(string $name, string $value): self
     {
         $this->headers[$name] = $value;
 
@@ -40,58 +35,45 @@ class RequestModel extends Model implements RequestModelInterface
     }
 
     /**
-     * @param string $token
-     * @return RequestModelInterface
+     * @return $this
      */
-    public function setBearerAuthHeader(string $token): RequestModelInterface
-    {
-        return $this->setHeader('Authorization', 'Bearer ' . $token);
-    }
-
-    /**
-     * @return RequestModelInterface
-     */
-    public function setJsonContentTypeHeader(): RequestModelInterface
+    public function setJsonContentTypeHeader(): self
     {
         return $this->setHeader('Content-Type', 'application/json');
     }
 
     /**
      * @param string $requestId
-     * @return RequestModelInterface
+     * @return $this
      */
-    public function setRequestIdHeader(string $requestId): RequestModelInterface
+    public function setRequestIdHeader(string $requestId): self
     {
         return $this->setHeader('X-Request-Id', $requestId);
     }
 
     /**
-     * @param int|string $orgId
-     * @return RequestModelInterface
+     * @param string $token
+     * @return $this
      */
-    public function setOrganizationIdHeader(int|string $orgId): RequestModelInterface
+    public function setBearerAuthHeader(string $token): self
     {
-        return $this->setHeader('X-Organization-Id', (string) $orgId);
+        return $this->setHeader('Authorization', 'Bearer ' . $token);
     }
 
     /**
      * @param string $tokenId
      * @param string $userId
-     * @param string $userUUID
      * @param string $userEmail
-     * @return RequestModelInterface
+     * @return $this
      */
     public function setAuthHeaders(
         string $tokenId,
         string $userId,
-        string $userUUID,
         string $userEmail
-    ): RequestModelInterface {
+    ): self {
         $this->setHeader('X-Auth-Token-Id', $tokenId);
         $this->setHeader('X-Auth-User-Id', $userId);
-        $this->setHeader('X-Auth-User-UUID', $userUUID);
         $this->setHeader('X-Auth-User-Email', $userEmail);
-
         return $this;
     }
 }

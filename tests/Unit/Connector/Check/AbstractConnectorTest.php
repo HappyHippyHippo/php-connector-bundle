@@ -2,16 +2,17 @@
 
 namespace Hippy\Connector\Tests\Unit\Connector\Check;
 
-use Hippy\Connector\Cache\CacheInterface;
+use Hippy\Connector\Config\Endpoint;
+use Hippy\Connector\Connector\AbstractCacheHandler;
+use Hippy\Connector\Connector\AbstractLoggerHandler;
+use Hippy\Connector\Connector\AbstractResponseHandler;
 use Hippy\Connector\Connector\Check\AbstractConnector;
 use Hippy\Connector\Connector\Check\RequestModel;
-use Hippy\Connector\Log\LoggerHandlerInterface;
-use Hippy\Connector\Model\Config\EndpointInterface;
-use Hippy\Connector\Model\RequestModelInterface;
-use Hippy\Connector\Transformer\ResponseTransformerInterface;
+use Hippy\Connector\Model\RequestModel as BaseRequestModel;
 use Hippy\Connector\Tests\Unit\Connector\ConnectorTester;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Request;
+use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Message\ResponseInterface;
 use ReflectionException;
@@ -26,17 +27,17 @@ class AbstractConnectorTest extends ConnectorTester
     /** @var ClientInterface&MockObject */
     private ClientInterface $client;
 
-    /** @var EndpointInterface&MockObject */
-    private EndpointInterface $config;
+    /** @var Endpoint&MockObject */
+    private Endpoint $config;
 
-    /** @var ResponseTransformerInterface&MockObject */
-    private ResponseTransformerInterface $transformer;
+    /** @var AbstractResponseHandler&MockObject */
+    private AbstractResponseHandler $transformer;
 
-    /** @var LoggerHandlerInterface&MockObject */
-    private LoggerHandlerInterface $logger;
+    /** @var AbstractLoggerHandler&MockObject */
+    private AbstractLoggerHandler $logger;
 
-    /** @var CacheInterface&MockObject */
-    private CacheInterface $cache;
+    /** @var AbstractCacheHandler&MockObject */
+    private AbstractCacheHandler $cache;
 
     /** @var AbstractConnector&MockObject */
     private AbstractConnector $connector;
@@ -47,10 +48,10 @@ class AbstractConnectorTest extends ConnectorTester
     protected function setUp(): void
     {
         $this->client = $this->createMock(ClientInterface::class);
-        $this->config = $this->createMock(EndpointInterface::class);
-        $this->transformer = $this->createMock(ResponseTransformerInterface::class);
-        $this->logger = $this->createMock(LoggerHandlerInterface::class);
-        $this->cache = $this->createMock(CacheInterface::class);
+        $this->config = $this->createMock(Endpoint::class);
+        $this->transformer = $this->createMock(AbstractResponseHandler::class);
+        $this->logger = $this->createMock(AbstractLoggerHandler::class);
+        $this->cache = $this->createMock(AbstractCacheHandler::class);
 
         $this->connector = $this->getMockForAbstractClass(
             AbstractConnector::class,
@@ -93,10 +94,10 @@ class AbstractConnectorTest extends ConnectorTester
      */
     public function testExecuteThrowsOnInvalidRequestModel(): void
     {
-        $requestModel = $this->createMock(RequestModelInterface::class);
+        $requestModel = $this->createMock(BaseRequestModel::class);
         $response = $this->createMock(ResponseInterface::class);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $this->executeReturnClientResponse(
             $this->client,

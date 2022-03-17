@@ -1,24 +1,19 @@
 <?php
 
-namespace Hippy\Connector\Tests\Unit\Model\Config;
+namespace Hippy\Connector\Tests\Unit\Config;
 
-use Hippy\Connector\Model\Config\Config;
-use Hippy\Connector\Model\Config\Endpoint;
+use Hippy\Connector\Config\Config;
+use Hippy\Connector\Config\Endpoint;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 
-/** @coversDefaultClass \Hippy\Connector\Model\Config\Config */
+/** @coversDefaultClass \Hippy\Connector\Config\Config */
 class ConfigTest extends TestCase
 {
     /**
      * @param array<string, mixed> $expected
      * @return void
      * @covers ::__construct
-     * @covers ::getClientConfig
-     * @covers ::getLogRequestLevel
-     * @covers ::getLogResponseLevel
-     * @covers ::getLogCachedResponseLevel
-     * @covers ::getLogExceptionLevel
      * @dataProvider getProvider
      */
     public function testConstruct(array $expected): void
@@ -27,10 +22,10 @@ class ConfigTest extends TestCase
         $sut = new Config($domain);
 
         $this->assertEquals($expected['client_config'], $sut->getClientConfig());
-        $this->assertEquals($expected['log_level_request'], $sut->getLogRequestLevel());
-        $this->assertEquals($expected['log_level_response'], $sut->getLogResponseLevel());
-        $this->assertEquals($expected['log_level_cached'], $sut->getLogCachedResponseLevel());
-        $this->assertEquals($expected['log_level_exception'], $sut->getLogExceptionLevel());
+        $this->assertEquals($expected['log_level_request'], $sut->getLogLevelRequest());
+        $this->assertEquals($expected['log_level_response'], $sut->getLogLevelResponse());
+        $this->assertEquals($expected['log_level_cached'], $sut->getLogLevelCached());
+        $this->assertEquals($expected['log_level_exception'], $sut->getLogLevelException());
     }
 
     /**
@@ -58,10 +53,10 @@ class ConfigTest extends TestCase
         }
 
         $this->assertEquals($expected['client_config'], $sut->getClientConfig());
-        $this->assertEquals($expected['log_level_request'], $sut->getLogRequestLevel());
-        $this->assertEquals($expected['log_level_response'], $sut->getLogResponseLevel());
-        $this->assertEquals($expected['log_level_cached'], $sut->getLogCachedResponseLevel());
-        $this->assertEquals($expected['log_level_exception'], $sut->getLogExceptionLevel());
+        $this->assertEquals($expected['log_level_request'], $sut->getLogLevelRequest());
+        $this->assertEquals($expected['log_level_response'], $sut->getLogLevelResponse());
+        $this->assertEquals($expected['log_level_cached'], $sut->getLogLevelCached());
+        $this->assertEquals($expected['log_level_exception'], $sut->getLogLevelException());
     }
 
     /**

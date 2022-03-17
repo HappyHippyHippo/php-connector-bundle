@@ -2,17 +2,16 @@
 
 namespace Hippy\Connector\Connector\Index;
 
-use Hippy\Connector\Model\ResponseModelInterface;
-use Hippy\Connector\Transformer\AbstractResponseTransformer;
+use Hippy\Connector\Connector\AbstractResponseHandler;
 use Psr\Http\Message\ResponseInterface;
 
-class ResponseTransformer extends AbstractResponseTransformer
+class ResponseHandler extends AbstractResponseHandler
 {
     /**
      * @param ResponseInterface $response
-     * @return ResponseModelInterface
+     * @return ResponseModel
      */
-    public function transform(ResponseInterface $response): ResponseModelInterface
+    public function transform(ResponseInterface $response): ResponseModel
     {
         $content = $this->getContent($response);
         $status = $this->getStatus($content);

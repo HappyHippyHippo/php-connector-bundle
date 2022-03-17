@@ -3,7 +3,7 @@
 namespace Hippy\Connector\Tests\Unit\Exception;
 
 use Hippy\Connector\Exception\ClientException;
-use Hippy\Connector\Model\RequestModelInterface;
+use Hippy\Connector\Model\RequestModel;
 use Hippy\Error\Error;
 use Hippy\Error\ErrorCollection;
 use Exception;
@@ -20,7 +20,7 @@ class ClientExceptionTest extends TestCase
      */
     public function testConstruct(): void
     {
-        $request = $this->createMock(RequestModelInterface::class);
+        $request = $this->createMock(RequestModel::class);
         $message = '__dummy_message__';
         $code = 123;
         $previous = new Exception();
@@ -43,7 +43,7 @@ class ClientExceptionTest extends TestCase
      */
     public function testFailedParseErrorMessage(string $message): void
     {
-        $request = $this->createMock(RequestModelInterface::class);
+        $request = $this->createMock(RequestModel::class);
         $sut = $this->getMockForAbstractClass(ClientException::class, [$request, $message]);
         $this->assertEquals(new ErrorCollection(), $sut->getErrors());
     }
@@ -82,7 +82,7 @@ class ClientExceptionTest extends TestCase
             new Error('__dummy_code_2__', '__dummy_message_2__'),
         ]);
 
-        $request = $this->createMock(RequestModelInterface::class);
+        $request = $this->createMock(RequestModel::class);
         $sut = $this->getMockForAbstractClass(ClientException::class, [$request, $message]);
         $this->assertEquals($expected, $sut->getErrors());
     }

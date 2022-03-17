@@ -6,27 +6,23 @@ use Hippy\Error\ErrorCollection;
 use Hippy\Model\Model;
 use Psr\Http\Message\ResponseInterface;
 
-class ResponseModel extends Model implements ResponseModelInterface
+/**
+ * @method ResponseInterface|null getResponse()
+ * @method ErrorCollection getErrors()
+ */
+class ResponseModel extends Model
 {
     /**
      * @param ResponseInterface|null $response
-     * @param ErrorCollection|null $errors
+     * @param ErrorCollection $errors
      */
     public function __construct(
         protected ?ResponseInterface $response = null,
-        protected ?ErrorCollection $errors = null,
+        protected ErrorCollection $errors = new ErrorCollection(),
     ) {
         parent::__construct();
 
         $this->addHideParser('response');
-    }
-
-    /**
-     * @return ResponseInterface|null
-     */
-    public function getResponse(): ?ResponseInterface
-    {
-        return $this->response;
     }
 
     /**
@@ -43,13 +39,5 @@ class ResponseModel extends Model implements ResponseModelInterface
     public function getHeaders(): array
     {
         return $this->response?->getHeaders() ?? [];
-    }
-
-    /**
-     * @return ErrorCollection
-     */
-    public function getErrors(): ErrorCollection
-    {
-        return $this->errors ?? new ErrorCollection();
     }
 }

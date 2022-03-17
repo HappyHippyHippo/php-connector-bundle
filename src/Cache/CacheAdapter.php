@@ -4,60 +4,51 @@ namespace Hippy\Connector\Cache;
 
 use DateTimeInterface;
 use Hippy\Connector\Exception\CacheException;
-use Hippy\Connector\Model\ResponseModelInterface;
-use Psr\Cache\CacheItemPoolInterface;
+use Hippy\Connector\Model\ResponseModel;
 use Psr\Cache\InvalidArgumentException;
 
-class CacheAdapter implements CacheAdapterInterface
+class CacheAdapter
 {
     /**
-     * @param CacheItemPoolInterface|null $cache
+     * @param CacheProxy|null $proxy
      */
-    public function __construct(private ?CacheItemPoolInterface $cache = null)
+    public function __construct(private ?CacheProxy $proxy = null)
     {
-    }
-
-    /**
-     * @return CacheItemPoolInterface|null
-     */
-    public function getCache(): ?CacheItemPoolInterface
-    {
-        return $this->cache;
     }
 
     /**
      * @param string $key
-     * @return ResponseModelInterface|null
+     * @return ResponseModel|null
      * @throws CacheException
      * @throws InvalidArgumentException
      */
-    public function loadResponse(string $key): ?ResponseModelInterface
+    public function loadResponse(string $key): ?ResponseModel
     {
-        if (empty($this->cache) || !$this->cache->hasItem($key)) {
+        if (empty($this->proxy) || !$this->proxy->hasItem($key)) {
             return null;
         }
 
-        return $this->cache->getItem($key)->get();
+        return $this->proxy->getItem($key)->get();
     }
 
     /**
      * @param string $key
-     * @param ResponseModelInterface $response
+     * @param ResponseModel $response
      * @param DateTimeInterface $ttl
      * @return bool
      * @throws CacheException
      * @throws InvalidArgumentException
      */
-    public function storeResponse(string $key, ResponseModelInterface $response, DateTimeInterface $ttl): bool
+    public function storeResponse(string $key, ResponseModel $response, DateTimeInterface $ttl): bool
     {
-        if (empty($this->cache)) {
+        if (empty($this->proxy)) {
             return false;
         }
 
-        $item = $this->cache->getItem($key);
+        $item = $this->proxy->getItem($key);
         $item->set($response);
         $item->expiresAt($ttl);
-        $this->cache->save($item);
+        $this->proxy->save($item);
 
         return true;
     }

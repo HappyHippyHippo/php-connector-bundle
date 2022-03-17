@@ -8,7 +8,6 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 
-/** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
 class CacheProxy implements CacheItemPoolInterface
 {
     /** @var CacheStrategyInterface[] */
@@ -29,9 +28,9 @@ class CacheProxy implements CacheItemPoolInterface
 
     /**
      * @param RepositoryFactoryInterface $repositoryFactory
-     * @return CacheItemPoolInterface
+     * @return $this
      */
-    public function setRepositoryFactory(RepositoryFactoryInterface $repositoryFactory): CacheItemPoolInterface
+    public function setRepositoryFactory(RepositoryFactoryInterface $repositoryFactory): self
     {
         foreach ($this->strategies as $strategy) {
             if ($strategy instanceof DatabaseCacheStrategyInterface) {

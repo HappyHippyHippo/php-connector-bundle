@@ -2,14 +2,14 @@
 
 namespace Hippy\Connector\Tests\Unit\Factory  ;
 
-use Hippy\Config\ConfigInterface as BaseConfigInterface;
-use Hippy\Connector\Cache\CacheAdapterInterface;
-use Hippy\Connector\Connector\ConnectorInterface;
+use Hippy\Config\Config as BaseConfig;
+use Hippy\Connector\Cache\CacheAdapter;
+use Hippy\Connector\Config\Config;
+use Hippy\Connector\Config\Endpoint;
+use Hippy\Connector\Connector\AbstractConnector;
 use Hippy\Connector\Factory\AbstractConnectorFactory;
 use Hippy\Connector\Factory\Strategy\CreateStrategyInterface;
-use Hippy\Connector\Log\LoggerAdapterInterface;
-use Hippy\Connector\Model\Config\ConfigInterface;
-use Hippy\Connector\Model\Config\EndpointInterface;
+use Hippy\Connector\Log\AbstractLoggerAdapter;
 use GuzzleHttp\ClientInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -20,27 +20,31 @@ use ReflectionProperty;
 /** @coversDefaultClass \Hippy\Connector\Factory\AbstractConnectorFactory */
 class AbstractConnectorFactoryTest extends TestCase
 {
-    /** @var BaseConfigInterface&MockObject */
-    private BaseConfigInterface $configInterface;
+    /** @var BaseConfig&MockObject */
+    private BaseConfig $configInterface;
 
-    /** @var ConfigInterface&MockObject */
-    private ConfigInterface $config;
+    /** @var Config&MockObject */
+    private Config $config;
 
-    /** @var LoggerAdapterInterface&MockObject */
-    private LoggerAdapterInterface $loggerAdapter;
+    /** @var AbstractLoggerAdapter&MockObject */
+    private AbstractLoggerAdapter $loggerAdapter;
 
-    /** @var CacheAdapterInterface&MockObject */
-    private CacheAdapterInterface $cacheAdapter;
+    /** @var CacheAdapter&MockObject */
+    private CacheAdapter $cacheAdapter;
 
     /**
      * @return void
      */
     protected function setUp(): void
     {
-        $this->configInterface = $this->createMock(BaseConfigInterface::class);
-        $this->config = $this->createMock(ConfigInterface::class);
-        $this->loggerAdapter = $this->createMock(LoggerAdapterInterface::class);
-        $this->cacheAdapter = $this->createMock(CacheAdapterInterface::class);
+        $this->configInterface = $this->createMock(BaseConfig::class);
+        $this->config = $this->getMockBuilder(Config::class)
+            ->onlyMethods(['getEndpoint'])
+            ->addMethods(['getClientConfig'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->loggerAdapter = $this->createMock(AbstractLoggerAdapter::class);
+        $this->cacheAdapter = $this->createMock(CacheAdapter::class);
     }
 
     /**
@@ -73,7 +77,7 @@ class AbstractConnectorFactoryTest extends TestCase
     {
         $endpointName = '__dummy_endpoint_name__';
 
-        $config = $this->createMock(EndpointInterface::class);
+        $config = $this->createMock(Endpoint::class);
         $this->config
             ->expects($this->once())
             ->method('getEndpoint')
@@ -82,7 +86,7 @@ class AbstractConnectorFactoryTest extends TestCase
 
         $client = $this->createMock(ClientInterface::class);
 
-        $connector = $this->createMock(ConnectorInterface::class);
+        $connector = $this->createMock(AbstractConnector::class);
         $strategy = $this->createMock(CreateStrategyInterface::class);
         $strategy->expects($this->once())->method('supports')->with($endpointName)->willReturn(true);
         $strategy

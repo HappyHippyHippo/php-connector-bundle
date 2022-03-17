@@ -6,7 +6,6 @@ use Hippy\Connector\Connector\AbstractConnector;
 use Hippy\Connector\Exception\ConnectionException;
 use Hippy\Connector\Exception\UnknownClientException;
 use Hippy\Connector\Model\ResponseModel;
-use Hippy\Connector\Model\ResponseModelInterface;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
@@ -60,7 +59,7 @@ class RequestTest extends TestBuilder
      */
     public function testRequestRunTransformedIfTransformerIdPresent(): void
     {
-        $responseModel = $this->createMock(ResponseModelInterface::class);
+        $responseModel = $this->createMock(ResponseModel::class);
         $this->transformer
             ->expects($this->once())
             ->method('transform')

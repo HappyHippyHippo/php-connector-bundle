@@ -12,7 +12,7 @@ services:
     public: false
 
   _instanceof:
-    Hippy\Config\Partial\PartialInterface:
+    Hippy\Config\Partial\AbstractPartial:
       tags: [hippy.config.partial]
     Hippy\Connector\Cache\CacheStrategyInterface:
       tags: [hippy.cache.strategy]
@@ -31,4 +31,4 @@ services:
 
   Hippy\Connector\Cache\CacheAdapter:
     arguments:
-      $cache: '@Hippy\Connector\Cache\CacheProxy'
+      $proxy: '@Hippy\Connector\Cache\CacheProxy'

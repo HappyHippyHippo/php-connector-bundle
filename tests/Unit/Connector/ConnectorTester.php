@@ -2,9 +2,9 @@
 
 namespace Hippy\Connector\Tests\Unit\Connector;
 
-use Hippy\Connector\Connector\ConnectorInterface;
+use Hippy\Connector\Connector\AbstractConnector;
 use Hippy\Connector\Exception\UnknownClientException;
-use Hippy\Connector\Model\RequestModelInterface;
+use Hippy\Connector\Model\RequestModel;
 use GuzzleHttp\ClientInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -17,27 +17,27 @@ use Symfony\Component\HttpFoundation\Response;
 class ConnectorTester extends TestCase
 {
     /**
-     * @param ConnectorInterface $connector
+     * @param AbstractConnector $connector
      * @param int $statusCode
      * @return void
      * @throws ReflectionException
      */
-    protected function expectedStatusCodeTester(ConnectorInterface $connector, int $statusCode)
+    protected function expectedStatusCodeTester(AbstractConnector $connector, int $statusCode)
     {
         $method = new ReflectionMethod($connector, 'getExpectedStatusCode');
         $this->assertEquals($statusCode, $method->invoke($connector));
     }
 
     /**
-     * @param ConnectorInterface $connector
-     * @param RequestModelInterface $requestModel
+     * @param AbstractConnector $connector
+     * @param RequestModel $requestModel
      * @param int $statusCode
      * @return void
      * @throws ReflectionException
      */
     public function handleFailureOnUnexpectedStatusCodeTester(
-        ConnectorInterface $connector,
-        RequestModelInterface $requestModel,
+        AbstractConnector $connector,
+        RequestModel $requestModel,
         int $statusCode
     ): void {
         $message = '__test_message__';
@@ -52,15 +52,15 @@ class ConnectorTester extends TestCase
     }
 
     /**
-     * @param ConnectorInterface $connector
-     * @param RequestModelInterface $requestModel
+     * @param AbstractConnector $connector
+     * @param RequestModel $requestModel
      * @param int $statusCode
      * @return void
      * @throws ReflectionException
      */
     public function handleFailureOnPossibleStatusCodeTester(
-        ConnectorInterface $connector,
-        RequestModelInterface $requestModel,
+        AbstractConnector $connector,
+        RequestModel $requestModel,
         int $statusCode
     ): void {
         $message = '__test_message__';
@@ -71,15 +71,15 @@ class ConnectorTester extends TestCase
     }
 
     /**
-     * @param ConnectorInterface $connector
+     * @param AbstractConnector $connector
      * @return void
      * @throws ReflectionException
      */
-    public function executeOnInvalidModel(ConnectorInterface $connector): void
+    public function executeOnInvalidModel(AbstractConnector $connector): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $requestModel = $this->createMock(RequestModelInterface::class);
+        $requestModel = $this->createMock(RequestModel::class);
 
         $method = new ReflectionMethod($connector, 'execute');
         $method->invoke($connector, $requestModel);
@@ -87,8 +87,8 @@ class ConnectorTester extends TestCase
 
     /**
      * @param ClientInterface&MockObject $client
-     * @param ConnectorInterface $connector
-     * @param RequestModelInterface $request
+     * @param AbstractConnector $connector
+     * @param RequestModel $request
      * @param ResponseInterface $response
      * @param callable $checked
      * @return void
@@ -96,8 +96,8 @@ class ConnectorTester extends TestCase
      */
     public function executeReturnClientResponse(
         ClientInterface&MockObject $client,
-        ConnectorInterface $connector,
-        RequestModelInterface $request,
+        AbstractConnector $connector,
+        RequestModel $request,
         ResponseInterface $response,
         callable $checked
     ): void {

@@ -13,7 +13,6 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder('hippy_connector');
-        return $treeBuilder;
+        return new TreeBuilder('hippy_connector');
     }
 }

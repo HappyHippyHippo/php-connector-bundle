@@ -1,66 +1,51 @@
 <?php
 
-namespace Hippy\Connector\Tests\Unit\Log;
+namespace Hippy\Connector\Tests\Unit\Connector;
 
-use Hippy\Connector\Log\AbstractLoggerHandler;
-use Hippy\Connector\Log\LoggerAdapterInterface;
-use Hippy\Connector\Model\RequestModelInterface;
-use Hippy\Connector\Model\ResponseModelInterface;
+use Hippy\Connector\Connector\AbstractLoggerHandler;
+use Hippy\Connector\Log\AbstractLoggerAdapter;
+use Hippy\Connector\Model\RequestModel;
+use Hippy\Connector\Model\ResponseModel;
 use Exception;
 use GuzzleHttp\Exception\RequestException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 
-/** @coversDefaultClass \Hippy\Connector\Log\AbstractLoggerHandler */
+/** @coversDefaultClass \Hippy\Connector\Connector\AbstractLoggerHandler */
 class AbstractLoggerHandlerTest extends TestCase
 {
-    /** @var LoggerAdapterInterface&MockObject */
-    private LoggerAdapterInterface $adapter;
+    /** @var AbstractLoggerAdapter&MockObject */
+    private AbstractLoggerAdapter $adapter;
 
     /** @var string */
-    private string $requestMsg;
+    private const REQUEST_MSG = '__dummy_request_message__';
 
     /** @var string */
-    private string $responseMsg;
+    private const RESPONSE_MSG = '__dummy_response_message__';
 
     /** @var string */
-    private string $cachedResponseMsg;
+    private const CACHED_MSG = '__dummy_cached_response_message__';
 
     /** @var string */
-    private string $exceptionMsg;
+    private const EXCEPTION_MSG = '__dummy_exception_message__';
 
     /**
      * @return void
      */
     protected function setUp(): void
     {
-        $this->requestMsg = '__dummy_request_message__';
-        $this->responseMsg = '__dummy_response_message__';
-        $this->cachedResponseMsg = '__dummy_cached_response_message__';
-        $this->exceptionMsg = '__dummy_exception_message__';
-
-        $this->adapter = $this->createMock(LoggerAdapterInterface::class);
+        $this->adapter = $this->createMock(AbstractLoggerAdapter::class);
     }
 
     /**
      * @return void
-     * @covers ::__construct()
-     * @covers ::getAdapter()
-     */
-    public function testGetAdapter(): void
-    {
-        $sut = $this->getMockForAbstractClass(AbstractLoggerHandler::class, [$this->adapter]);
-        $this->assertEquals($this->adapter, $sut->getAdapter());
-    }
-
-    /**
-     * @return void
+     * @covers ::__construct
      * @covers ::writeRequest
      */
     public function testWriteRequestWithNoAdapter(): void
     {
-        $request = $this->createMock(RequestModelInterface::class);
+        $request = $this->createMock(RequestModel::class);
 
         $this->adapter->expects($this->never())->method('logRequest');
 
@@ -70,16 +55,30 @@ class AbstractLoggerHandlerTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct
      * @covers ::writeRequest
      */
     public function testWriteRequest(): void
     {
+        $requestHeaders = ['header' => ['__dummy_request_header__']];
+        $serializedRequest = ['field' => '__dummy_value__'];
         $mockedSkeletonEntry = ['mock' => '__dummy_skeleton_entry__'];
-        $expected = $mockedSkeletonEntry;
+        $expected = array_merge($mockedSkeletonEntry, [
+            'request' => [
+                'headers' => ['header' => '__dummy_request_header__'],
+                'params' => $serializedRequest,
+            ],
+        ]);
 
-        $request = $this->createMock(RequestModelInterface::class);
+        $request = $this->getMockBuilder(RequestModel::class)
+            ->onlyMethods(['jsonSerialize'])
+            ->addMethods(['getHeaders'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $request->expects($this->once())->method('getHeaders')->willReturn($requestHeaders);
+        $request->expects($this->once())->method('jsonSerialize')->willReturn($serializedRequest);
 
-        $this->adapter->expects($this->once())->method('logRequest')->with($this->requestMsg, $expected);
+        $this->adapter->expects($this->once())->method('logRequest')->with(self::REQUEST_MSG, $expected);
 
         $sut = $this->createSUT($this->adapter, $mockedSkeletonEntry);
         $sut->writeRequest($request);
@@ -87,13 +86,14 @@ class AbstractLoggerHandlerTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct
      * @covers ::writeResponse
      * @covers ::flatHeaders
      */
     public function testWriteResponseWithNoAdapter(): void
     {
-        $request = $this->createMock(RequestModelInterface::class);
-        $response = $this->createMock(ResponseModelInterface::class);
+        $request = $this->createMock(RequestModel::class);
+        $response = $this->createMock(ResponseModel::class);
 
         $this->adapter->expects($this->never())->method('logResponse');
 
@@ -103,6 +103,7 @@ class AbstractLoggerHandlerTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct
      * @covers ::writeResponse
      * @covers ::flatHeaders
      */
@@ -126,16 +127,20 @@ class AbstractLoggerHandlerTest extends TestCase
             ],
         ]);
 
-        $request = $this->createMock(RequestModelInterface::class);
+        $request = $this->getMockBuilder(RequestModel::class)
+            ->onlyMethods(['jsonSerialize'])
+            ->addMethods(['getHeaders'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $request->expects($this->once())->method('getHeaders')->willReturn($requestHeaders);
         $request->expects($this->once())->method('jsonSerialize')->willReturn($serializedRequest);
 
-        $response = $this->createMock(ResponseModelInterface::class);
+        $response = $this->createMock(ResponseModel::class);
         $response->expects($this->once())->method('getHeaders')->willReturn($responseHeaders);
         $response->expects($this->once())->method('jsonSerialize')->willReturn($serializedResponse);
         $response->expects($this->once())->method('getStatusCode')->willReturn($statusCode);
 
-        $this->adapter->expects($this->once())->method('logResponse')->with($this->responseMsg, $expected);
+        $this->adapter->expects($this->once())->method('logResponse')->with(self::RESPONSE_MSG, $expected);
 
         $sut = $this->createSUT($this->adapter, $mockedSkeletonEntry);
         $sut->writeResponse($request, $response);
@@ -143,13 +148,14 @@ class AbstractLoggerHandlerTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct
      * @covers ::writeDryResponse
      * @covers ::flatHeaders
      */
     public function testWriteDryResponseWithNoAdapter(): void
     {
-        $request = $this->createMock(RequestModelInterface::class);
-        $response = $this->createMock(ResponseModelInterface::class);
+        $request = $this->createMock(RequestModel::class);
+        $response = $this->createMock(ResponseModel::class);
 
         $this->adapter->expects($this->never())->method('logResponse');
 
@@ -159,6 +165,7 @@ class AbstractLoggerHandlerTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct
      * @covers ::writeDryResponse
      * @covers ::flatHeaders
      */
@@ -176,14 +183,18 @@ class AbstractLoggerHandlerTest extends TestCase
             ],
         ]);
 
-        $request = $this->createMock(RequestModelInterface::class);
+        $request = $this->getMockBuilder(RequestModel::class)
+            ->onlyMethods(['jsonSerialize'])
+            ->addMethods(['getHeaders'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $request->expects($this->once())->method('getHeaders')->willReturn($requestHeaders);
         $request->expects($this->once())->method('jsonSerialize')->willReturn($serializedRequest);
 
-        $response = $this->createMock(ResponseModelInterface::class);
+        $response = $this->createMock(ResponseModel::class);
         $response->expects($this->once())->method('getStatusCode')->willReturn($statusCode);
 
-        $this->adapter->expects($this->once())->method('logResponse')->with($this->responseMsg, $expected);
+        $this->adapter->expects($this->once())->method('logResponse')->with(self::RESPONSE_MSG, $expected);
 
         $sut = $this->createSUT($this->adapter, $mockedSkeletonEntry);
         $sut->writeDryResponse($request, $response);
@@ -191,13 +202,14 @@ class AbstractLoggerHandlerTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct
      * @covers ::writeCachedResponse
      * @covers ::flatHeaders
      */
     public function testWriteCachedResponseWithNoAdapter(): void
     {
-        $request = $this->createMock(RequestModelInterface::class);
-        $response = $this->createMock(ResponseModelInterface::class);
+        $request = $this->createMock(RequestModel::class);
+        $response = $this->createMock(ResponseModel::class);
 
         $this->adapter->expects($this->never())->method('logCachedResponse');
 
@@ -207,6 +219,7 @@ class AbstractLoggerHandlerTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct
      * @covers ::writeCachedResponse
      * @covers ::flatHeaders
      */
@@ -224,14 +237,18 @@ class AbstractLoggerHandlerTest extends TestCase
             ],
         ]);
 
-        $request = $this->createMock(RequestModelInterface::class);
+        $request = $this->getMockBuilder(RequestModel::class)
+            ->onlyMethods(['jsonSerialize'])
+            ->addMethods(['getHeaders'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $request->expects($this->once())->method('getHeaders')->willReturn($requestHeaders);
         $request->expects($this->once())->method('jsonSerialize')->willReturn($serializedRequest);
 
-        $response = $this->createMock(ResponseModelInterface::class);
+        $response = $this->createMock(ResponseModel::class);
         $response->expects($this->once())->method('getStatusCode')->willReturn($statusCode);
 
-        $this->adapter->expects($this->once())->method('logCachedResponse')->with($this->cachedResponseMsg, $expected);
+        $this->adapter->expects($this->once())->method('logCachedResponse')->with(self::CACHED_MSG, $expected);
 
         $sut = $this->createSUT($this->adapter, $mockedSkeletonEntry);
         $sut->writeCachedResponse($request, $response);
@@ -239,12 +256,13 @@ class AbstractLoggerHandlerTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct
      * @covers ::writeException
      * @covers ::flatHeaders
      */
     public function testWriteExceptionWithNoAdapter(): void
     {
-        $request = $this->createMock(RequestModelInterface::class);
+        $request = $this->createMock(RequestModel::class);
         $exception = $this->createMock(RequestException::class);
 
         $this->adapter->expects($this->never())->method('logException');
@@ -255,6 +273,7 @@ class AbstractLoggerHandlerTest extends TestCase
 
     /**
      * @return void
+     * @covers ::__construct
      * @covers ::writeException
      * @covers ::flatHeaders
      */
@@ -274,7 +293,11 @@ class AbstractLoggerHandlerTest extends TestCase
             'message' => $errorMessage,
         ]);
 
-        $request = $this->createMock(RequestModelInterface::class);
+        $request = $this->getMockBuilder(RequestModel::class)
+            ->onlyMethods(['jsonSerialize'])
+            ->addMethods(['getHeaders'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $request->expects($this->once())->method('getHeaders')->willReturn($requestHeaders);
         $request->expects($this->once())->method('jsonSerialize')->willReturn($serializedRequest);
 
@@ -284,30 +307,24 @@ class AbstractLoggerHandlerTest extends TestCase
         $property = new ReflectionProperty(Exception::class, 'message');
         $property->setValue($exception, $errorMessage);
 
-        $this->adapter->expects($this->once())->method('logException')->with($this->exceptionMsg, $expected);
+        $this->adapter->expects($this->once())->method('logException')->with(self::EXCEPTION_MSG, $expected);
 
         $sut = $this->createSUT($this->adapter, $mockedSkeletonEntry);
         $sut->writeException($request, $exception);
     }
 
     /**
-     * @param LoggerAdapterInterface|null $adapter
+     * @param AbstractLoggerAdapter|null $adapter
      * @param array<string, mixed> $mockedSkeletonEntry
      * @return AbstractLoggerHandler
      */
     private function createSUT(
-        ?LoggerAdapterInterface $adapter = null,
+        ?AbstractLoggerAdapter $adapter = null,
         array $mockedSkeletonEntry = []
     ): AbstractLoggerHandler {
         $sut = $this->getMockForAbstractClass(
             AbstractLoggerHandler::class,
-            [
-                $adapter,
-                $this->requestMsg,
-                $this->responseMsg,
-                $this->cachedResponseMsg,
-                $this->exceptionMsg
-            ],
+            [$adapter, self::REQUEST_MSG, self::RESPONSE_MSG, self::CACHED_MSG, self::EXCEPTION_MSG],
             '',
             true,
             true,

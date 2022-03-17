@@ -11,7 +11,6 @@ class RequestModelTest extends TestCase
     /**
      * @return void
      * @covers ::__construct
-     * @covers ::isDeep
      */
     public function testConstructWithoutHeaders(): void
     {
@@ -24,7 +23,6 @@ class RequestModelTest extends TestCase
     /**
      * @return void
      * @covers ::__construct
-     * @covers ::isDeep
      */
     public function testConstructWithHeaders(): void
     {

@@ -3,8 +3,7 @@
 namespace Hippy\Connector\Config\Partial;
 
 use Hippy\Config\Partial\AbstractPartial as BaseAbstractPartial;
-use Hippy\Config\Partial\PartialInterface;
-use Hippy\Connector\Model\Config\Config;
+use Hippy\Connector\Config\Config;
 
 abstract class AbstractPartial extends BaseAbstractPartial
 {
@@ -20,9 +19,9 @@ abstract class AbstractPartial extends BaseAbstractPartial
 
     /**
      * @param array<string, mixed> $config
-     * @return PartialInterface
+     * @return $this
      */
-    public function load(array $config = []): PartialInterface
+    public function load(array $config = []): self
     {
         $key = $this->domain . '.config';
         if (array_key_exists($key, $config)) {

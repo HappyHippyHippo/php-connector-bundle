@@ -1,21 +1,21 @@
 <?php
 
-namespace Hippy\Connector\Model\Config;
+namespace Hippy\Connector\Config;
 
 use Hippy\Model\Collection;
-use Hippy\Model\ModelInterface;
+use Hippy\Model\Model;
 use InvalidArgumentException;
 
 class EndpointCollection extends Collection
 {
     /**
-     * @param ModelInterface $item
+     * @param Model $item
      * @return $this
      * @throws InvalidArgumentException
      */
-    public function add(ModelInterface $item): EndpointCollection
+    public function add(Model $item): self
     {
-        if (!($item instanceof EndpointInterface)) {
+        if (!($item instanceof Endpoint)) {
             throw new InvalidArgumentException('Invalid endpoint configuration instance');
         }
 

@@ -11,7 +11,7 @@
         "ext-iconv": "*",
         "ext-json": "*",
         "guzzlehttp/guzzle": "^7.2",
-        "happyhippyhippo/php-skeleton-bundle": "^1.0",
+        "happyhippyhippo/php-skeleton-bundle": "^1.1",
         "symfony/console": "^6.0",
         "symfony/dotenv": "^6.0",
         "symfony/flex": "^2.0",
