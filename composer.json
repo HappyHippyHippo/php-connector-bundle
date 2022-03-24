@@ -1,5 +1,5 @@
 {
-    "name": "happyhippyhippo/connector-bundle",
+    "name": "happyhippyhippo/php-connector-bundle",
     "description": "Hippy API connection bundle used to facilitate API calling bundles",
     "type": "symfony-bundle",
     "license": "proprietary",
