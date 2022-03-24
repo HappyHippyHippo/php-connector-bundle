@@ -4,38 +4,38 @@ namespace Hippy\Connector\Tests\Unit\Config;
 
 use Hippy\Connector\Config\EndpointCollection;
 use Hippy\Connector\Config\Endpoint;
-use Hippy\Model\Model;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 /** @coversDefaultClass \Hippy\Connector\Config\EndpointCollection */
 class EndpointCollectionTest extends TestCase
 {
     /**
      * @return void
-     * @covers ::add
+     * @covers ::__construct
      */
-    public function testAddThrowsOnInvalidEndpointConfigurationType(): void
+    public function testConstructorWithoutArguments(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-
-        $endpoint = $this->createMock(Model::class);
-
         $sut = new EndpointCollection();
-        $sut->add($endpoint);
+
+        $prop = new ReflectionProperty(EndpointCollection::class, 'type');
+        $this->assertEquals(Endpoint::class, $prop->getValue($sut));
+        $this->assertEquals([], $sut->getItems());
     }
 
     /**
      * @return void
-     * @covers ::add
+     * @covers ::__construct
      */
-    public function testAddStoreTheEndpointConfiguration(): void
+    public function testConstructorWithArguments(): void
     {
-        $endpoint = $this->createMock(Endpoint::class);
+        $endpoint1 = $this->createMock(Endpoint::class);
+        $endpoint2 = $this->createMock(Endpoint::class);
 
-        $sut = new EndpointCollection();
-        $this->assertSame($sut, $sut->add($endpoint));
-        $this->assertEquals(1, count($sut));
-        $this->assertSame($endpoint, $sut[0]);
+        $sut = new EndpointCollection([$endpoint1, $endpoint2]);
+
+        $prop = new ReflectionProperty(EndpointCollection::class, 'type');
+        $this->assertEquals(Endpoint::class, $prop->getValue($sut));
+        $this->assertEquals([$endpoint1, $endpoint2], $sut->getItems());
     }
 }

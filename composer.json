@@ -1,5 +1,5 @@
 {
-    "name": "hippy/connector-bundle",
+    "name": "happyhippyhippo/connector-bundle",
     "description": "Hippy API connection bundle used to facilitate API calling bundles",
     "type": "symfony-bundle",
     "license": "proprietary",
@@ -11,7 +11,7 @@
         "ext-iconv": "*",
         "ext-json": "*",
         "guzzlehttp/guzzle": "^7.2",
-        "happyhippyhippo/php-skeleton-bundle": "^1.1",
+        "happyhippyhippo/php-skeleton-bundle": "^1.2",
         "symfony/console": "^6.0",
         "symfony/dotenv": "^6.0",
         "symfony/flex": "^2.0",

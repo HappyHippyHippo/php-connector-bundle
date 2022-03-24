@@ -3,23 +3,14 @@
 namespace Hippy\Connector\Config;
 
 use Hippy\Model\Collection;
-use Hippy\Model\Model;
-use InvalidArgumentException;
 
 class EndpointCollection extends Collection
 {
     /**
-     * @param Model $item
-     * @return $this
-     * @throws InvalidArgumentException
+     * @param Endpoint[] $items
      */
-    public function add(Model $item): self
+    public function __construct(array $items = [])
     {
-        if (!($item instanceof Endpoint)) {
-            throw new InvalidArgumentException('Invalid endpoint configuration instance');
-        }
-
-        $this->items[] = $item;
-        return $this;
+        parent::__construct(Endpoint::class, $items);
     }
 }

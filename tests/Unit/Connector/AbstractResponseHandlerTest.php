@@ -1,6 +1,6 @@
 <?php
 
-namespace Hippy\Connector\Tests\Unit\Transformer;
+namespace Hippy\Connector\Tests\Unit\Connector;
 
 use Hippy\Connector\Connector\AbstractResponseHandler;
 use Hippy\Connector\Exception\InvalidResponseContentException;
