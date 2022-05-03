@@ -10,6 +10,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      APP_ENV: 'github'
 
     steps:
       - uses: actions/checkout@v2
@@ -36,36 +38,23 @@ jobs:
       - name: Install dependencies
         if: steps.composer-cache.outputs.cache-hit != 'true'
         env:
-          APP_ENV: 'test'
           COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{secrets.COMPOSER_AUTH}}"} }'
         run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: Run PHP code beautifier
-        env:
-          APP_ENV: 'test'
         run: bin/console quality:phpcbf
 
       - name: Run PHP code standard fixer
-        env:
-          APP_ENV: 'test'
         run: bin/console quality:phpfixer
 
       - name: Run PHP code sniffer
-        env:
-          APP_ENV: 'test'
         run: bin/console quality:phpcs
 
       - name: Run PHP stan
-        env:
-          APP_ENV: 'test'
         run: bin/console quality:phpstan
 
       - name: Run PHP unit
-        env:
-          APP_ENV: 'test'
-        run: bin/console quality:phpunit -f xml
+        run: bin/console quality:phpunit -f xml --config /phpunit.github.xml
 
       - name: Validate test coverage
-        env:
-          APP_ENV: 'test'
         run: php phpunit-threshold.php tests-reports/phpunit/index.xml 90

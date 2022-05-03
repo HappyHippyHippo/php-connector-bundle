@@ -1,6 +1,6 @@
 <?php
 
-namespace Hippy\Connector;
+namespace Hippy\Connector\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;

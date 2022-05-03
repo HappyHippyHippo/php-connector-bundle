@@ -87,7 +87,7 @@ abstract class AbstractConnector
             $statusCode = $response->getStatusCode();
             if ($statusCode != $this->getExpectedStatusCode()) {
                 $success = false;
-                $this->handleFailure($request, $response->getBody(), $statusCode);
+                $this->handleFailure($request, (string) $response->getBody(), $statusCode);
             }
 
             // parse response
@@ -104,6 +104,10 @@ abstract class AbstractConnector
             }
 
             return $response;
+        } catch (UnknownClientException $exception) {
+            $this->logException($request, $exception);
+
+            throw $exception;
         } catch (GuzzleException | InvalidResponseContentException $exception) {
             $this->logException($request, $exception);
 
