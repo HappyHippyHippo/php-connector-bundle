@@ -1,12 +1,5 @@
 parameters:
 
 services:
-  Hippy\Connector\Factory\Strategy\CreateStrategyInterface:
-    tags: [hippy.connector.strategy]
-
   Hippy\Connector\Tests\Functional\Config\Partial\Partial:
     tags: [hippy.config.partial]
-
-  Hippy\Connector\Tests\Functional\Connector\Factory:
-    arguments:
-      $strategies: !tagged_iterator hippy.connector.strategy
